@@ -2,6 +2,12 @@
 
 AWS CDK constructs for Amazon Connect FlowConfig - a third-party app for configuring variables and prompts in Connect contact flows.
 
+## Links
+
+- [Screenshots](./docs/screenshots/)
+- [Architecture](./docs/Architecture.md)
+- [DataModel](./docs/DataModel.md)
+
 ## Installation
 
 ```bash

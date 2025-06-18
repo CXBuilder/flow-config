@@ -24,6 +24,7 @@
   "main": "dist/infrastructure/index.js",
   "types": "dist/infrastructure/index.d.ts",
   "files": [
+    "docs",
     "dist",
     ".jsii",
     "CHANGELOG.md",
