@@ -1,0 +1,553 @@
+openapi: '3.0.1'
+info:
+  title: 'CXBuilder Flow Config API'
+  description: 'API for managing flow configurations in CXBuilder, including speech synthesis with Amazon Polly.'
+  version: '1.0.0'
+components:
+  securitySchemes:
+    CognitoAuthorizer:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        # Will be added at synth-time
+        providerARNs: []
+  schemas:
+    InitResponse:
+      type: object
+      description: Provides run-time configuration to the frontend app
+      additionalProperties: false
+      required:
+        - region
+        - userPoolId
+        - clientId
+      properties:
+        region:
+          type: string
+        userPoolId:
+          type: string
+        clientId:
+          type: string
+    User:
+      type: object
+      description: Describe the Connect user
+      additionalProperties: false
+      properties:
+        Id:
+          type: string
+        Arn:
+          type: string
+        Username:
+          type: string
+        IdentityInfo:
+          type: object
+          properties:
+            FirstName:
+              type: string
+            LastName:
+              type: string
+            Email:
+              type: string
+            SecondaryEmail:
+              type: string
+            Mobile:
+              type: string
+        PhoneConfig:
+          type: object
+          properties:
+            PhoneType:
+              type: string
+            AutoAccept:
+              type: boolean
+            AfterContactWorkTimeLimit:
+              type: number
+            DeskPhoneNumber:
+              type: string
+        DirectoryUserId:
+          type: string
+        SecurityProfileIds:
+          type: array
+          items:
+            type: string
+        RoutingProfileId:
+          type: string
+        HierarchyGroupId:
+          type: string
+        Tags:
+          type: object
+          additionalProperties:
+            type: string
+        LastModifiedTime:
+          type: string
+          format: date-time
+        LastModifiedRegion:
+          type: string
+    FlowConfig:
+      type: object
+      required:
+        - id
+        - description
+        - variables
+        - prompts
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the flow config
+        description:
+          type: string
+          description: User-friendly description of the flow config
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+          description: Key-value pairs of configurable variables
+        prompts:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                voice:
+                  type: string
+                  description: Text content for voice channel (may include SSML)
+                chat:
+                  type: string
+                  description: Optional text content for chat channel
+              required:
+                - voice
+          description: Collection of prompts organized by name, language, and channel
+    FlowConfigList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowConfigSummary'
+    FlowConfigSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the flow config
+        description:
+          type: string
+          description: User-friendly description of the flow config
+        accessLevel:
+          type: string
+          enum: [Full, Edit, Read]
+          description: User's access level for this flow config
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+    SpeechPreviewRequest:
+      type: object
+      description: Request parameters for speech synthesis using Amazon Polly
+      required:
+        - languageCode
+        - voiceId
+        - text
+      properties:
+        languageCode:
+          type: string
+          description: Language code (e.g., en-US, es-US)
+          example: en-US
+          pattern: '^[a-z]{2}-[A-Z]{2}$'
+        voiceId:
+          type: string
+          description: Amazon Polly voice ID
+          example: Joanna
+        text:
+          type: string
+          description: Text to synthesize (may include SSML)
+          example: <speak>Hello, welcome to our service.</speak>
+          maxLength: 3000
+    FlowConfigPreviewRequest:
+      type: object
+      description: Request parameters for previewing flow config data
+      required:
+        - flowConfig
+        - lang
+        - channel
+      properties:
+        flowConfig:
+          $ref: '#/components/schemas/FlowConfig'
+          description: The flow config object to preview
+        lang:
+          type: string
+          description: Language code (e.g., en-US, es-US)
+          pattern: '^[a-z]{2}-[A-Z]{2}$'
+        channel:
+          type: string
+          description: Channel type for the prompt
+          enum: [voice, chat]
+paths:
+  /api/init:
+    get:
+      description: Get the run-time configuration for the frontend, such as auth
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: InitHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/InitResponse'
+  /api/users/{userId}:
+    get:
+      description: Get the current user information from Amazon Connect
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: UsersHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/User'
+  /api/flow-config:
+    get:
+      summary: List flow configs
+      description: Returns a list of flow configs that the user has access to
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: FlowConfigHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: listFlowConfigs
+      parameters:
+        - name: pattern
+          in: query
+          description: Optional pattern to filter flow configs by ID
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowConfigList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/flow-config/{id}:
+    get:
+      summary: Get a specific flow config
+      description: Returns a specific flow config by ID
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: FlowConfigHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: getFlowConfig
+      parameters:
+        - name: id
+          in: path
+          description: ID of the flow config to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowConfig'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Flow config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Create or update a flow config
+      description: Creates a new flow config or updates an existing one
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: FlowConfigHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: saveFlowConfig
+      parameters:
+        - name: id
+          in: path
+          description: ID of the flow config to create or update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Flow config object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowConfig'
+      responses:
+        '200':
+          description: Flow config updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowConfig'
+        '201':
+          description: Flow config created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlowConfig'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Payload too large (exceeds DynamoDB size limits)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a flow config
+      description: Deletes a specific flow config by ID
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: FlowConfigHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: deleteFlowConfig
+      parameters:
+        - name: id
+          in: path
+          description: ID of the flow config to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Flow config deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Flow config not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/flow-config/preview:
+    post:
+      summary: Preview how the flow will see the config
+      description: Executes the get-config lambda to preview how connect will see the data with a provided flow config object
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: FlowConfigHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: previewFlowConfigSpeech
+      requestBody:
+        description: Flow config and preview parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowConfigPreviewRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid input or prompt not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Flow config or prompt not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/preview-speech:
+    post:
+      summary: Preview speech using Amazon Polly
+      description: Calls the Amazon Polly Synthesize Speech API and returns the resulting audio stream
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: PreviewSpeechHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: previewSpeech
+      requestBody:
+        description: Speech synthesis parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpeechPreviewRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Text too large for synthesis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /{proxy+}:
+    get:
+      summary: Serve static frontend files
+      description: Serves static frontend assets and handles SPA routing
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: StaticHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Static file served successfully
+          content:
+            text/html:
+              schema:
+                type: string
+            text/css:
+              schema:
+                type: string
+            application/javascript:
+              schema:
+                type: string
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found
+  /:
+    get:
+      summary: Serve frontend root
+      description: Serves the main frontend application (index.html)
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: StaticHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      responses:
+        '200':
+          description: Frontend application served successfully
+          content:
+            text/html:
+              schema:
+                type: string

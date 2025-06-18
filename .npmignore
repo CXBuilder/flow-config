@@ -1,0 +1,64 @@
+# Source files (only include compiled dist/)
+/infrastructure/
+/bin/
+/frontend/
+/scripts/
+/docs/
+/test/
+*.ts
+!*.d.ts
+
+# Build artifacts and cache
+cdk.out/
+.cdk.staging/
+node_modules/
+.nyc_output/
+coverage/
+
+# Development files
+.env
+.env.*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Test files
+jest.config.ts
+test.setup.ts
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Configuration files
+tsconfig.json
+.eslintrc*
+.gitignore
+cdk.json
+
+# Development scripts and docs
+CLAUDE.md
+
+
+# Exclude jsii outdir
+packages
+
+# Include .jsii and .jsii.gz
+!.jsii
+!.jsii.gz

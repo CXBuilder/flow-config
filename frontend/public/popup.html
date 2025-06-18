@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      window.addEventListener('load', (e) => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('code')) {
+          const code = params.get('code');
+          if(window.opener){
+            window.opener.postMessage({ name: 'auth', code });
+          } else {
+            console.error('window.opener is undefined, cannot send code back')
+          }          
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <p>You may now close this window.</p>
+  </body>
+</html>
