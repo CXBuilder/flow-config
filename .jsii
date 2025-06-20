@@ -20,7 +20,6 @@
     "yaml": "^2.8.0"
   },
   "dependencies": {
-    "@aws-solutions-constructs/aws-openapigateway-lambda": "^2.85.2",
     "aws-cdk-lib": "2.194.0",
     "constructs": "^10.0.0"
   },
@@ -104,78 +103,6 @@
           ],
           "distName": "aws-cdk.cloud-assembly-schema",
           "module": "aws_cdk.cloud_assembly_schema"
-        }
-      }
-    },
-    "@aws-solutions-constructs/aws-openapigateway-lambda": {
-      "targets": {
-        "dotnet": {
-          "iconUrl": "https://raw.githubusercontent.com/aws/aws-cdk/master/logo/default-256-dark.png",
-          "namespace": "Amazon.SolutionsConstructs.AWS.OpenApiGatewayLambda",
-          "packageId": "Amazon.SolutionsConstructs.AWS.OpenApiGatewayLambda",
-          "signAssembly": true
-        },
-        "java": {
-          "maven": {
-            "artifactId": "openapigatewaylambda",
-            "groupId": "software.amazon.awsconstructs"
-          },
-          "package": "software.amazon.awsconstructs.services.openapigatewaylambda"
-        },
-        "js": {
-          "npm": "@aws-solutions-constructs/aws-openapigateway-lambda"
-        },
-        "python": {
-          "distName": "aws-solutions-constructs.aws-openapigateway-lambda",
-          "module": "aws_solutions_constructs.aws_openapigateway_lambda"
-        }
-      }
-    },
-    "@aws-solutions-constructs/core": {
-      "targets": {
-        "dotnet": {
-          "iconUrl": "https://raw.githubusercontent.com/aws/aws-cdk/master/logo/default-256-dark.png",
-          "namespace": "Amazon.SolutionsConstructs.AWS.Core",
-          "packageId": "Amazon.SolutionsConstructs.AWS.Core",
-          "signAssembly": true
-        },
-        "java": {
-          "maven": {
-            "artifactId": "core",
-            "groupId": "software.amazon.awsconstructs"
-          },
-          "package": "software.amazon.awsconstructs.services.core"
-        },
-        "js": {
-          "npm": "@aws-solutions-constructs/core"
-        },
-        "python": {
-          "distName": "aws-solutions-constructs.core",
-          "module": "aws_solutions_constructs.core"
-        }
-      }
-    },
-    "@aws-solutions-constructs/resources": {
-      "targets": {
-        "dotnet": {
-          "iconUrl": "https://raw.githubusercontent.com/aws/aws-cdk/master/logo/default-256-dark.png",
-          "namespace": "Amazon.SolutionsConstructs.AWS.Resources",
-          "packageId": "Amazon.SolutionsConstructs.AWS.Resources",
-          "signAssembly": true
-        },
-        "java": {
-          "maven": {
-            "artifactId": "resources",
-            "groupId": "software.amazon.awsconstructs"
-          },
-          "package": "software.amazon.awsconstructs.services.resources"
-        },
-        "js": {
-          "npm": "@aws-solutions-constructs/resources"
-        },
-        "python": {
-          "distName": "aws-solutions-constructs.resources",
-          "module": "aws_solutions_constructs.resources"
         }
       }
     },
@@ -4591,6 +4518,6 @@
       "symbolId": "infrastructure/FlowConfigStack:VpcConfig"
     }
   },
-  "version": "1.0.1",
-  "fingerprint": "V7ICP5NiiXfM53BnBQnXOFRX/nYJTyaFcStmhn/v5jo="
+  "version": "1.0.2",
+  "fingerprint": "w9Ycg9k4gI4a60byR9Aq9YQSosFtZL/sCppEdcuzvDU="
 }

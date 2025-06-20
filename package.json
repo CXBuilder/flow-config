@@ -99,7 +99,6 @@
     "yaml"
   ],
   "peerDependencies": {
-    "@aws-solutions-constructs/aws-openapigateway-lambda": "^2.85.2",
     "aws-cdk-lib": "2.194.0",
     "constructs": "^10.0.0"
   },
