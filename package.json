@@ -1,6 +1,6 @@
 {
   "name": "@cxbuilder/flow-config",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "description": "Amazon Connect third-party app for configuring variables and prompts in Connect contact flows",
   "author": {
@@ -55,7 +55,6 @@
   },
   "devDependencies": {
     "@aws-lambda-powertools/logger": "^2.21.0",
-    "@aws-solutions-constructs/aws-openapigateway-lambda": "2.85.2",
     "@types/aws-lambda": "^8.10.149",
     "@types/jest": "^29.5.14",
     "@types/mime-types": "^2.1.4",
