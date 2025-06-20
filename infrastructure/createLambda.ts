@@ -37,15 +37,21 @@ export function createLambda<TEnv>(
   // Determine the code location based on logical ID
   // If id is "Handler", use the parent construct's ID instead
   const backendId = id === 'Handler' ? scope.node.id : id;
-  const codeLocation = resolve(__dirname, '..', 'backend', backendId);
-  const expectedIndexFile = resolve(codeLocation, 'index.js');
+  let codeLocation = resolve(__dirname, '..', 'backend', backendId);
+  let expectedIndexFile = resolve(codeLocation, 'index.js');
 
-  // Verify the bundled Lambda code exists
+  // Verify the bundled Lambda code exists, try ../dist/backend if not found
   if (!existsSync(expectedIndexFile)) {
-    throw new Error(
-      `Lambda function ${backendId} bundled code not found at: ${expectedIndexFile}. ` +
-        'Please run "npm run build:lambdas" to bundle the Lambda functions.'
-    );
+    // Try alternative location in ../dist/backend
+    codeLocation = resolve(__dirname, '..', 'dist', 'backend', backendId);
+    expectedIndexFile = resolve(codeLocation, 'index.js');
+    
+    if (!existsSync(expectedIndexFile)) {
+      throw new Error(
+        `Lambda function ${backendId} bundled code not found at: ${expectedIndexFile} or ${resolve(__dirname, '..', 'backend', backendId, 'index.js')}. ` +
+          'Please run "npm run build:lambdas" to bundle the Lambda functions.'
+      );
+    }
   }
 
   console.log(
