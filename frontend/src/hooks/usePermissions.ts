@@ -151,5 +151,6 @@ export function usePermissions() {
     isAdmin: () => accessLevel === 'Full',
     canEdit: () => accessLevel === 'Edit' || accessLevel === 'Full',
     canRead: () => accessLevel !== null,
+    hasAnyAccess: () => accessLevel !== null,
   };
 }

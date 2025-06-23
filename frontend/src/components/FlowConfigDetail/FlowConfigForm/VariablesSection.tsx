@@ -13,6 +13,7 @@ interface VariablesSectionProps {
   onUpdate: (updates: Partial<FlowConfig>) => void;
   onAddVariable: () => void;
   canAddVariables?: boolean;
+  isReadOnly?: boolean;
 }
 
 export function VariablesSection({
@@ -20,6 +21,7 @@ export function VariablesSection({
   onUpdate,
   onAddVariable,
   canAddVariables = true,
+  isReadOnly = false,
 }: VariablesSectionProps) {
   const variableItems = Object.entries(flowConfig.variables).map(
     ([key, value]) => ({
@@ -59,6 +61,7 @@ export function VariablesSection({
             handleUpdateVariableValue(item.key, detail.value)
           }
           placeholder="Variable value"
+          readOnly={isReadOnly}
         />
       ),
     },

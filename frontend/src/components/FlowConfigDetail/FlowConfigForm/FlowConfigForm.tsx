@@ -14,6 +14,7 @@ interface FlowConfigFormProps {
   onAddLanguage: (promptName: string) => void;
   onVoiceChange: (language: string, voiceId: string) => void;
   canMakeStructuralChanges?: boolean;
+  isReadOnly?: boolean;
 }
 
 export function FlowConfigForm({
@@ -26,6 +27,7 @@ export function FlowConfigForm({
   onAddLanguage,
   onVoiceChange,
   canMakeStructuralChanges = true,
+  isReadOnly = false,
 }: FlowConfigFormProps) {
   const handleRemovePrompt = (promptName: string) => {
     const newPrompts = { ...flowConfig.prompts };
@@ -40,14 +42,15 @@ export function FlowConfigForm({
           flowConfig={flowConfig}
           isEditing={isEditing}
           onUpdate={onUpdate}
-          readOnly={!canMakeStructuralChanges}
+          readOnly={isReadOnly || !canMakeStructuralChanges}
         />
 
         <VariablesSection
           flowConfig={flowConfig}
           onUpdate={onUpdate}
           onAddVariable={onAddVariable}
-          canAddVariables={canMakeStructuralChanges}
+          canAddVariables={!isReadOnly && canMakeStructuralChanges}
+          isReadOnly={isReadOnly}
         />
 
         <PromptsSection
@@ -58,6 +61,8 @@ export function FlowConfigForm({
           onAddLanguage={onAddLanguage}
           onRemovePrompt={handleRemovePrompt}
           onVoiceChange={onVoiceChange}
+          canMakeStructuralChanges={!isReadOnly && canMakeStructuralChanges}
+          isReadOnly={isReadOnly}
         />
       </SpaceBetween>
     </Form>

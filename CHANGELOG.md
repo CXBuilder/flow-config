@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-06-23
+
+### Added
+
+- Role-based access control (RBAC) using Amazon Cognito User Groups
+- Three permission levels: FlowConfigAdmin, FlowConfigEdit, and FlowConfigRead
+- Backend permission validation for all API endpoints
+- Frontend UI adapts based on user permissions
+- Read-only mode for users without edit access
+- Access denied screen for users without any FlowConfig permissions
+
+### Changed
+
+- Replaced placeholder permission system with full Cognito Groups implementation
+- FlowConfigEdit users can add languages to prompts but cannot remove existing ones
+- FlowConfigEdit users can add/remove channels but cannot modify structure
+- Preview functionality remains available to all permission levels
+
 ## [1.0.2] - 2025-06-20
 
 - Converted to `SpecRestApi` because `@aws-solutions-constructs/aws-openapigateway-lambda` is not compatible with `Role.customizeRoles`
