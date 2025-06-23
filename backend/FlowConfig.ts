@@ -16,7 +16,7 @@ import { FlowConfigEnv } from '../infrastructure/api/FlowConfig/FlowConfig.inter
 import { respondError, respondMessage, respondObject } from './shared/respond';
 import { sendError } from './shared/snsClient';
 import { transformFlowConfig } from './shared/transformFlowConfig';
-import { validateFlowConfigPermission, canMakeStructuralChanges } from './shared/permissions';
+import { validateFlowConfigPermission } from './shared/permissions';
 
 const env = process.env as unknown as FlowConfigEnv;
 const client = new DynamoDBClient();
@@ -210,7 +210,7 @@ async function saveFlowConfig(
 
     // For FlowConfigEdit users, validate they're only changing values, not structure
     if (accessLevel === 'Edit' && existingConfig) {
-      const structuralChangeError = validateEditOnlyChanges(existingConfig, body);
+      const structuralChangeError = validateEditOnlyChanges(existingConfig as FlowConfig, body);
       if (structuralChangeError) {
         return respondMessage(403, `FlowConfigEdit users cannot make structural changes: ${structuralChangeError}`);
       }

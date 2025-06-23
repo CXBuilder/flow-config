@@ -135,13 +135,13 @@ export function canMakeStructuralChanges(claims: Record<string, string>): boolea
  * Validate that a user has permission for a flow config operation
  * This is the main function to be used by API endpoints
  * @param claims User claims from Cognito JWT token
- * @param flowConfigId The flow config ID (not used in v1, but kept for v2 compatibility)
+ * @param _flowConfigId The flow config ID (not used in v1, but kept for v2 compatibility)
  * @param action The action being performed
  * @returns AccessLevel if authorized, null if not authorized
  */
 export function validateFlowConfigPermission(
   claims: Record<string, string>,
-  flowConfigId: string,
+  _flowConfigId: string,
   action: Action
 ): AccessLevel | null {
   // In v1, all permissions are global (flowConfigId is ignored)
