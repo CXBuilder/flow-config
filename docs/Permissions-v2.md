@@ -34,9 +34,9 @@ User tags follow a specific format to define access levels and targets:
 
 | Tag Format                    | Description                                             | Example                                          |
 | ----------------------------- | ------------------------------------------------------- | ------------------------------------------------ |
-| `AdminAppFull: [pattern]`     | Grants full access to flow configs matching the pattern | `AdminAppFull: *` or `AdminAppFull: aci-ccaas-*` |
-| `AdminAppRead: [pattern]`     | Grants read access to flow configs matching the pattern | `AdminAppRead: aci-ccaas-*`                      |
-| `AdminAppEdit: [specific-id]` | Grants edit access to a specific flow config            | `AdminAppEdit: +18001234444`                     |
+| `FlowConfigFull: [pattern]`     | Grants full access to flow configs matching the pattern | `FlowConfigFull: *` or `FlowConfigFull: aci-ccaas-*` |
+| `FlowConfigRead: [pattern]`     | Grants read access to flow configs matching the pattern | `FlowConfigRead: aci-ccaas-*`                      |
+| `FlowConfigEdit: [specific-id]` | Grants edit access to a specific flow config            | `FlowConfigEdit: +18001234444`                     |
 
 ### Access Level Hierarchy
 
@@ -90,33 +90,33 @@ Below are examples of Cedar policies for Amazon Verified Permissions:
 // Grant full access to flow configs matching a pattern
 permit(
   principal,
-  action == AdminApp::Action::"*",
-  resource in AdminApp::FlowConfig
+  action == FlowConfig::Action::"*",
+  resource in FlowConfig::FlowConfig
 )
 when {
-  principal has AdminAppFull &&
-  (principal.AdminAppFull == "*" || resource.id like principal.AdminAppFull)
+  principal has FlowConfigFull &&
+  (principal.FlowConfigFull == "*" || resource.id like principal.FlowConfigFull)
 };
 
 // Grant read access to flow configs matching a pattern
 permit(
   principal,
-  action == AdminApp::Action::"Read",
-  resource in AdminApp::FlowConfig
+  action == FlowConfig::Action::"Read",
+  resource in FlowConfig::FlowConfig
 )
 when {
-  principal has AdminAppRead &&
-  resource.id like principal.AdminAppRead
+  principal has FlowConfigRead &&
+  resource.id like principal.FlowConfigRead
 };
 
 // Grant edit access to a specific flow config
 permit(
   principal,
-  action in [AdminApp::Action::"Read", AdminApp::Action::"Edit"],
-  resource in AdminApp::FlowConfig
+  action in [FlowConfig::Action::"Read", FlowConfig::Action::"Edit"],
+  resource in FlowConfig::FlowConfig
 )
 when {
-  principal has AdminAppEdit &&
-  resource.id == principal.AdminAppEdit
+  principal has FlowConfigEdit &&
+  resource.id == principal.FlowConfigEdit
 };
 ```
