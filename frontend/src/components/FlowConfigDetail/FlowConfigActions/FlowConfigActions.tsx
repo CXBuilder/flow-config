@@ -6,6 +6,7 @@ interface FlowConfigActionsProps {
   previewLoading: boolean;
   flowConfigId?: string;
   canPreview: boolean;
+  canSave?: boolean;
   onClose: () => void;
   onSave: () => void;
   onPreview: () => void;
@@ -16,6 +17,7 @@ export function FlowConfigActions({
   saving,
   previewLoading,
   canPreview,
+  canSave = true,
   onClose,
   onSave,
   onPreview,
@@ -32,9 +34,11 @@ export function FlowConfigActions({
         >
           Preview
         </Button>
-        <Button variant="primary" loading={saving} onClick={onSave}>
-          {isEditing ? 'Save Changes' : 'Create'}
-        </Button>
+        {canSave && (
+          <Button variant="primary" loading={saving} onClick={onSave}>
+            {isEditing ? 'Save Changes' : 'Create'}
+          </Button>
+        )}
       </SpaceBetween>
     </Box>
   );

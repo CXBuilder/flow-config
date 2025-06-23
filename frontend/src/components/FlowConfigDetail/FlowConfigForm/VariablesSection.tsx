@@ -12,12 +12,16 @@ interface VariablesSectionProps {
   flowConfig: FlowConfig;
   onUpdate: (updates: Partial<FlowConfig>) => void;
   onAddVariable: () => void;
+  canAddVariables?: boolean;
+  isReadOnly?: boolean;
 }
 
 export function VariablesSection({
   flowConfig,
   onUpdate,
   onAddVariable,
+  canAddVariables = true,
+  isReadOnly = false,
 }: VariablesSectionProps) {
   const variableItems = Object.entries(flowConfig.variables).map(
     ([key, value]) => ({
@@ -57,10 +61,11 @@ export function VariablesSection({
             handleUpdateVariableValue(item.key, detail.value)
           }
           placeholder="Variable value"
+          readOnly={isReadOnly}
         />
       ),
     },
-    {
+    ...(canAddVariables ? [{
       id: 'actions',
       header: 'Actions',
       cell: (item: { key: string; value: string }) => (
@@ -71,7 +76,7 @@ export function VariablesSection({
           ariaLabel={`Remove variable ${item.key}`}
         />
       ),
-    },
+    }] : []),
   ];
 
   return (
@@ -79,9 +84,11 @@ export function VariablesSection({
       headerText="Variables"
       headerCounter={`(${variableItems.length})`}
       headerActions={
-        <Button onClick={onAddVariable} iconName="add-plus">
-          Add Variable
-        </Button>
+        canAddVariables && (
+          <Button onClick={onAddVariable} iconName="add-plus">
+            Add Variable
+          </Button>
+        )
       }
       defaultExpanded={variableItems.length > 0}
     >

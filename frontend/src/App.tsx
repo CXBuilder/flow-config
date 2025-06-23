@@ -8,8 +8,26 @@ import {
   TextContent,
 } from '@cloudscape-design/components';
 import FlowConfigList from './components/FlowConfigList';
+import { NoPermissions } from './components/NoPermissions';
+import { usePermissions } from './hooks/usePermissions';
+import { useContext, useState, useEffect } from 'react';
+import { CognitoAuthenticationContext } from './contexts/CognitoAuthenticationProvider';
 
 function App() {
+  const { hasAnyAccess } = usePermissions();
+  const tokenProvider = useContext(CognitoAuthenticationContext);
+  const [userName, setUserName] = useState<string>();
+
+  useEffect(() => {
+    if (tokenProvider) {
+      tokenProvider.getIdTokenPayload().then((token) => {
+        setUserName(token['cognito:username'] || token.email);
+      }).catch((error) => {
+        console.error('Failed to get user name:', error);
+      });
+    }
+  }, [tokenProvider]);
+
   return (
     <div
       style={{
@@ -22,7 +40,11 @@ function App() {
       <div style={{ flex: 1 }}>
         <Box padding="l">
           <ContentLayout>
-            <FlowConfigList />
+            {hasAnyAccess() ? (
+              <FlowConfigList />
+            ) : (
+              <NoPermissions userName={userName} />
+            )}
           </ContentLayout>
         </Box>
       </div>
