@@ -4,6 +4,7 @@ import {
   UserPool,
   UserPoolClient,
   UserPoolClientIdentityProvider,
+  CfnUserPoolGroup,
 } from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import { IVpc, ISecurityGroup, ISubnet } from 'aws-cdk-lib/aws-ec2';
@@ -184,6 +185,7 @@ export class FlowConfigStack extends cdk.Stack {
     this.api = new Api(this);
 
     this.userPoolClient = this.createUserPoolClient();
+    this.createUserPoolGroups();
 
     this.associate3pApp();
 
@@ -225,6 +227,37 @@ export class FlowConfigStack extends cdk.Stack {
       value: client.userPoolClientId,
     });
     return client;
+  }
+
+  /**
+   * Create Cognito User Groups for role-based access control
+   */
+  createUserPoolGroups(): void {
+    const { prefix } = this.props;
+
+    // FlowConfigAdmin - Full CRUD access
+    new CfnUserPoolGroup(this, 'FlowConfigAdminGroup', {
+      userPoolId: this.userPool.userPoolId,
+      groupName: 'FlowConfigAdmin',
+      description: 'Full administrative access to all flow configs - can create, read, update, and delete flow configs and all their properties',
+      precedence: 1,
+    });
+
+    // FlowConfigEdit - Edit variable/prompt values only
+    new CfnUserPoolGroup(this, 'FlowConfigEditGroup', {
+      userPoolId: this.userPool.userPoolId,
+      groupName: 'FlowConfigEdit',
+      description: 'Edit access to flow configs - can read and modify variable values and prompt content but cannot add/remove fields or delete configs',
+      precedence: 2,
+    });
+
+    // FlowConfigRead - Read-only access
+    new CfnUserPoolGroup(this, 'FlowConfigReadGroup', {
+      userPoolId: this.userPool.userPoolId,
+      groupName: 'FlowConfigRead',
+      description: 'Read-only access to all flow configs for reporting and reference purposes',
+      precedence: 3,
+    });
   }
 
   /**
