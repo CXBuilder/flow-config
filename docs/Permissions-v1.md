@@ -52,10 +52,13 @@ The application uses three Cognito User Groups:
    - Read all flow configs
    - Update variable values in existing flow configs
    - Update prompt content in existing flow configs
+   - Add new languages to existing prompts
+   - Add/remove channels (voice/chat) for existing prompts
    - **Cannot** create new flow configs
    - **Cannot** delete flow configs
    - **Cannot** add new variables or prompts
    - **Cannot** remove existing variables or prompts
+   - **Cannot** remove existing languages from prompts
    - **Cannot** modify flow config descriptions
 
 3. **FlowConfigRead Group**:

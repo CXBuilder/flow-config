@@ -233,13 +233,12 @@ export class FlowConfigStack extends cdk.Stack {
    * Create Cognito User Groups for role-based access control
    */
   createUserPoolGroups(): void {
-    const { prefix } = this.props;
-
     // FlowConfigAdmin - Full CRUD access
     new CfnUserPoolGroup(this, 'FlowConfigAdminGroup', {
       userPoolId: this.userPool.userPoolId,
       groupName: 'FlowConfigAdmin',
-      description: 'Full administrative access to all flow configs - can create, read, update, and delete flow configs and all their properties',
+      description:
+        'Full administrative access to all flow configs - can create, read, update, and delete flow configs and all their properties',
       precedence: 1,
     });
 
@@ -247,7 +246,8 @@ export class FlowConfigStack extends cdk.Stack {
     new CfnUserPoolGroup(this, 'FlowConfigEditGroup', {
       userPoolId: this.userPool.userPoolId,
       groupName: 'FlowConfigEdit',
-      description: 'Edit access to flow configs - can read and modify variable values and prompt content but cannot add/remove fields or delete configs',
+      description:
+        'Edit access to flow configs - can read and modify variable values and prompt content but cannot add/remove fields or delete configs',
       precedence: 2,
     });
 
@@ -255,7 +255,8 @@ export class FlowConfigStack extends cdk.Stack {
     new CfnUserPoolGroup(this, 'FlowConfigReadGroup', {
       userPoolId: this.userPool.userPoolId,
       groupName: 'FlowConfigRead',
-      description: 'Read-only access to all flow configs for reporting and reference purposes',
+      description:
+        'Read-only access to all flow configs for reporting and reference purposes',
       precedence: 3,
     });
   }

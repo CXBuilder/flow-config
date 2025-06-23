@@ -16,6 +16,7 @@ import { FlowConfigEnv } from '../infrastructure/api/FlowConfig/FlowConfig.inter
 import { respondError, respondMessage, respondObject } from './shared/respond';
 import { sendError } from './shared/snsClient';
 import { transformFlowConfig } from './shared/transformFlowConfig';
+import { validateFlowConfigPermission, canMakeStructuralChanges } from './shared/permissions';
 
 const env = process.env as unknown as FlowConfigEnv;
 const client = new DynamoDBClient();
@@ -88,7 +89,7 @@ async function listFlowConfigs(
 
     for (const config of filteredConfigs) {
       // Check access level using user claims
-      const accessLevel = await checkPermissions(claims, config.id, 'Read');
+      const accessLevel = validateFlowConfigPermission(claims, config.id, 'Read');
       if (accessLevel) {
         resultItems.push({
           id: config.id,
@@ -111,7 +112,7 @@ async function getFlowConfig(
 ): Promise<APIGatewayProxyStructuredResultV2> {
   try {
     // Check permissions
-    const accessLevel = await checkPermissions(claims, flowConfigId, 'Read');
+    const accessLevel = validateFlowConfigPermission(claims, flowConfigId, 'Read');
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
@@ -202,9 +203,17 @@ async function saveFlowConfig(
     const action = existingConfig ? 'Edit' : 'Create';
 
     // Check permissions
-    const accessLevel = await checkPermissions(claims, flowConfigId, action);
+    const accessLevel = validateFlowConfigPermission(claims, flowConfigId, action);
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
+    }
+
+    // For FlowConfigEdit users, validate they're only changing values, not structure
+    if (accessLevel === 'Edit' && existingConfig) {
+      const structuralChangeError = validateEditOnlyChanges(existingConfig, body);
+      if (structuralChangeError) {
+        return respondMessage(403, `FlowConfigEdit users cannot make structural changes: ${structuralChangeError}`);
+      }
     }
 
     // Save to DynamoDB
@@ -228,7 +237,7 @@ async function deleteFlowConfig(
 ): Promise<APIGatewayProxyStructuredResultV2> {
   try {
     // Check permissions
-    const accessLevel = await checkPermissions(claims, flowConfigId, 'Delete');
+    const accessLevel = validateFlowConfigPermission(claims, flowConfigId, 'Delete');
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
@@ -317,7 +326,7 @@ async function previewFlowConfig(
     }
 
     // Check permissions for the flow config ID
-    const accessLevel = await checkPermissions(claims, flowConfig.id, 'Read');
+    const accessLevel = validateFlowConfigPermission(claims, flowConfig.id, 'Read');
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
@@ -334,18 +343,54 @@ async function previewFlowConfig(
   }
 }
 
-async function checkPermissions(
-  _claims: Record<string, string>,
-  flowConfigId: string,
-  action: string
-): Promise<'Full' | 'Edit' | 'Read' | null> {
-  try {
-    return Promise.resolve('Full');
-  } catch (error) {
-    console.error(
-      `Error checking permissions for ${flowConfigId}, action ${action}:`,
-      error
-    );
-    return null;
+/**
+ * Validate that FlowConfigEdit users are only changing values, not structure
+ * @param existingConfig The existing flow config from database
+ * @param newConfig The new flow config being saved
+ * @returns Error message if structural changes detected, null if only value changes
+ */
+function validateEditOnlyChanges(existingConfig: FlowConfig, newConfig: FlowConfig): string | null {
+  // Check if description changed (not allowed for Edit users)
+  if (existingConfig.description !== newConfig.description) {
+    return 'Cannot modify description';
   }
+
+  // Check if variable keys changed (not allowed for Edit users)
+  const existingVarKeys = Object.keys(existingConfig.variables || {}).sort();
+  const newVarKeys = Object.keys(newConfig.variables || {}).sort();
+  
+  if (existingVarKeys.length !== newVarKeys.length || 
+      !existingVarKeys.every((key, index) => key === newVarKeys[index])) {
+    return 'Cannot add or remove variables';
+  }
+
+  // Check if prompt structure changed (not allowed for Edit users)
+  const existingPromptKeys = Object.keys(existingConfig.prompts || {}).sort();
+  const newPromptKeys = Object.keys(newConfig.prompts || {}).sort();
+  
+  if (existingPromptKeys.length !== newPromptKeys.length || 
+      !existingPromptKeys.every((key, index) => key === newPromptKeys[index])) {
+    return 'Cannot add or remove prompts';
+  }
+
+  // Check if languages were removed for each prompt (adding is allowed)
+  for (const promptName of existingPromptKeys) {
+    const existingPrompt = existingConfig.prompts[promptName];
+    const newPrompt = newConfig.prompts[promptName];
+    
+    const existingLangs = Object.keys(existingPrompt || {});
+    const newLangs = Object.keys(newPrompt || {});
+    
+    // Check if any existing languages were removed (not allowed)
+    for (const existingLang of existingLangs) {
+      if (!newLangs.includes(existingLang)) {
+        return `Cannot remove language ${existingLang} from prompt ${promptName}`;
+      }
+    }
+    
+    // Adding languages and channels is allowed, so no further validation needed
+  }
+
+  return null; // No structural changes detected
 }
+

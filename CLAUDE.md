@@ -66,9 +66,11 @@ The application follows a serverless architecture with these key components:
 
 ### Security & Authorization
 
-- AWS Verified Permissions for fine-grained access control
-- Three access levels: Full, Edit, Read
-- Permission evaluation based on user tags and flow config IDs
+- **Initial Release (v1)**: Amazon Cognito User Groups for role-based access control
+  - FlowConfigAdmin: Full CRUD access to all flow configs
+  - FlowConfigEdit: Edit variable/prompt values in existing flow configs
+  - FlowConfigRead: Read-only access to all flow configs
+- **Future Release (v2)**: AWS Verified Permissions for fine-grained, per-config access control
 
 ## Data Model
 
