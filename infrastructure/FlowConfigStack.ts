@@ -7,7 +7,12 @@ import {
   CfnUserPoolGroup,
 } from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
-import { IVpc, ISecurityGroup, ISubnet } from 'aws-cdk-lib/aws-ec2';
+import {
+  IVpc,
+  ISecurityGroup,
+  ISubnet,
+  IInterfaceVpcEndpoint,
+} from 'aws-cdk-lib/aws-ec2';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import { Api } from './api/Api';
@@ -40,9 +45,11 @@ export interface CognitoConfig {
  */
 export interface VpcConfig {
   /**
-   * The VPC ID to deploy resources into
+   * If provided, lambdas will be deployed in VPC
    */
   readonly vpcId: string;
+
+  readonly availabilityZones: string[];
 
   /**
    * Security group IDs for Lambda functions
@@ -55,9 +62,10 @@ export interface VpcConfig {
   readonly privateSubnetIds: string[];
 
   /**
-   * Security group IDs for VPC endpoints
+   * Existing VPC endpoint ID for API Gateway
+   * If provided, private API GW endpoint will be
    */
-  readonly vpcEndpointSecurityGroupIds: string[];
+  readonly vpcEndpointId?: string;
 }
 
 /**
@@ -83,7 +91,7 @@ export interface ResolvedVpcConfig {
   readonly vpc: IVpc;
   readonly lambdaSecurityGroups: ISecurityGroup[];
   readonly privateSubnets: ISubnet[];
-  readonly vpcEndpointSecurityGroups: ISecurityGroup[];
+  readonly vpcEndpoint?: IInterfaceVpcEndpoint;
 }
 
 export interface FlowConfigStackProps extends cdk.StackProps {
@@ -210,7 +218,9 @@ export class FlowConfigStack extends cdk.Stack {
     const { prefix, cognito } = this.props;
 
     if (!cognito || !this.userPool) {
-      throw new Error('Cognito configuration and user pool are required to create user pool client');
+      throw new Error(
+        'Cognito configuration and user pool are required to create user pool client'
+      );
     }
 
     const domains = ['http://localhost:3000', this.appUrl];
@@ -394,13 +404,17 @@ export class FlowConfigStack extends cdk.Stack {
   private resolveVpcConfig(vpcConfig: VpcConfig): ResolvedVpcConfig {
     const {
       vpcId,
+      availabilityZones,
       lambdaSecurityGroupIds,
       privateSubnetIds,
-      vpcEndpointSecurityGroupIds,
+      vpcEndpointId,
     } = vpcConfig;
 
     // Resolve VPC
-    const vpc = ec2.Vpc.fromLookup(this, 'ResolvedVpc', { vpcId });
+    const vpc = ec2.Vpc.fromVpcAttributes(this, 'ResolvedVpc', {
+      vpcId,
+      availabilityZones: availabilityZones,
+    });
 
     // Resolve Lambda security groups
     const lambdaSecurityGroups = lambdaSecurityGroupIds.map((sgId, index) =>
@@ -416,21 +430,23 @@ export class FlowConfigStack extends cdk.Stack {
       ec2.Subnet.fromSubnetId(this, `PrivateSubnet${index}`, subnetId)
     );
 
-    // Resolve VPC endpoint security groups
-    const vpcEndpointSecurityGroups = vpcEndpointSecurityGroupIds.map(
-      (sgId, index) =>
-        ec2.SecurityGroup.fromSecurityGroupId(
+    // Resolve existing VPC endpoint if provided
+    const vpcEndpoint = vpcEndpointId
+      ? ec2.InterfaceVpcEndpoint.fromInterfaceVpcEndpointAttributes(
           this,
-          `VpcEndpointSecurityGroup${index}`,
-          sgId
+          'ExistingVpcEndpoint',
+          {
+            vpcEndpointId,
+            port: 443,
+          }
         )
-    );
+      : undefined;
 
     return {
       vpc,
       lambdaSecurityGroups,
       privateSubnets,
-      vpcEndpointSecurityGroups,
+      vpcEndpoint,
     };
   }
 }

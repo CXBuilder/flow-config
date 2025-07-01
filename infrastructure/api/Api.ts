@@ -13,10 +13,6 @@ import {
   AnyPrincipal,
   ServicePrincipal,
 } from 'aws-cdk-lib/aws-iam';
-import {
-  InterfaceVpcEndpoint,
-  InterfaceVpcEndpointAwsService,
-} from 'aws-cdk-lib/aws-ec2';
 import { Init } from './Init';
 import { FlowConfig } from './FlowConfig';
 import { PreviewSpeech } from './PreviewSpeech';
@@ -38,19 +34,12 @@ export class Api extends Construct {
 
     // Configure API Gateway based on VPC settings
     const vpcConfig = stack._getResolvedVpcConfig();
-    const apiGatewayProps: RestApiBaseProps = vpcConfig
+    const apiGatewayProps: RestApiBaseProps = vpcConfig?.vpcEndpoint
       ? {
           restApiName: stack.props.prefix,
           endpointConfiguration: {
             types: [EndpointType.PRIVATE],
-            vpcEndpoints: [
-              new InterfaceVpcEndpoint(this, 'ApiVpcEndpoint', {
-                vpc: vpcConfig.vpc,
-                service: InterfaceVpcEndpointAwsService.APIGATEWAY,
-                subnets: { subnets: vpcConfig.privateSubnets },
-                securityGroups: vpcConfig.vpcEndpointSecurityGroups,
-              }),
-            ],
+            vpcEndpoints: [vpcConfig.vpcEndpoint],
           },
           policy: this.createVpcEndpointPolicy(vpcConfig.vpc.vpcId),
         }
@@ -79,7 +68,7 @@ export class Api extends Construct {
     } else {
       // Remove Cognito authorization when not configured
       delete spec.components.securitySchemes.CognitoAuthorizer;
-      
+
       // Remove security requirements from all endpoints
       this.removeSecurityFromEndpoints(spec);
     }
@@ -129,8 +118,8 @@ export class Api extends Construct {
    */
   private removeSecurityFromEndpoints(spec: any): void {
     // Iterate through all paths and remove security requirements
-    Object.keys(spec.paths).forEach(path => {
-      Object.keys(spec.paths[path]).forEach(method => {
+    Object.keys(spec.paths).forEach((path) => {
+      Object.keys(spec.paths[path]).forEach((method) => {
         if (spec.paths[path][method].security) {
           delete spec.paths[path][method].security;
         }
