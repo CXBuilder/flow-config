@@ -130,6 +130,7 @@ export function usePermissions() {
   
   useEffect(() => {
     if (tokenProvider) {
+      // Cognito is configured - use token-based permissions
       tokenProvider.getIdTokenPayload().then((token) => {
         const groups = extractCognitoGroups(token);
         setUserGroups(groups);
@@ -139,6 +140,10 @@ export function usePermissions() {
         setUserGroups([]);
         setAccessLevel(null);
       });
+    } else {
+      // Cognito is not configured - grant full access for demo
+      setUserGroups([COGNITO_GROUPS.ADMIN]);
+      setAccessLevel('Full');
     }
   }, [tokenProvider]);
   

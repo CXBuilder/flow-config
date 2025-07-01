@@ -25,6 +25,9 @@ function App() {
       }).catch((error) => {
         console.error('Failed to get user name:', error);
       });
+    } else {
+      // Cognito not configured - use a default name for demo
+      setUserName('Demo User');
     }
   }, [tokenProvider]);
 

@@ -91,7 +91,7 @@ export interface FlowConfigStackProps extends cdk.StackProps {
    * Used for resource naming
    */
   readonly prefix: string;
-  readonly cognito: CognitoConfig;
+  readonly cognito?: CognitoConfig;
   readonly connectInstanceArn: string;
 
   /**
@@ -116,9 +116,9 @@ export interface FlowConfigStackProps extends cdk.StackProps {
 }
 
 export class FlowConfigStack extends cdk.Stack {
-  userPool: IUserPool;
+  userPool?: IUserPool;
   private api: Api;
-  userPoolClient: UserPoolClient;
+  userPoolClient?: UserPoolClient;
   alertTopic: Topic;
   table: cdk.aws_dynamodb.ITable;
 
@@ -175,17 +175,19 @@ export class FlowConfigStack extends cdk.Stack {
       this.alertTopic.addSubscription(new EmailSubscription(e))
     );
 
-    this.userPool = UserPool.fromUserPoolId(
-      this,
-      'UserPool',
-      cognito.userPoolId
-    );
+    // Only create Cognito resources if configuration is provided
+    if (cognito) {
+      this.userPool = UserPool.fromUserPoolId(
+        this,
+        'UserPool',
+        cognito.userPoolId
+      );
+      this.userPoolClient = this.createUserPoolClient();
+      this.createUserPoolGroups();
+    }
 
     const getConfig = new GetConfig(this);
     this.api = new Api(this);
-
-    this.userPoolClient = this.createUserPoolClient();
-    this.createUserPoolGroups();
 
     this.associate3pApp();
 
@@ -206,6 +208,10 @@ export class FlowConfigStack extends cdk.Stack {
 
   createUserPoolClient(): UserPoolClient {
     const { prefix, cognito } = this.props;
+
+    if (!cognito || !this.userPool) {
+      throw new Error('Cognito configuration and user pool are required to create user pool client');
+    }
 
     const domains = ['http://localhost:3000', this.appUrl];
 
@@ -233,6 +239,10 @@ export class FlowConfigStack extends cdk.Stack {
    * Create Cognito User Groups for role-based access control
    */
   createUserPoolGroups(): void {
+    if (!this.userPool) {
+      throw new Error('User pool is required to create user pool groups');
+    }
+
     // FlowConfigAdmin - Full CRUD access
     new CfnUserPoolGroup(this, 'FlowConfigAdminGroup', {
       userPoolId: this.userPool.userPoolId,

@@ -15,14 +15,19 @@ export function useApi() {
     body?: unknown
   ): Promise<TResult | undefined> {
     try {
-      const accessToken = await tokenProvider.getIdToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+
+      // Add authorization header only if tokenProvider exists (Cognito configured)
+      if (tokenProvider) {
+        const accessToken = await tokenProvider.getIdToken();
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
 
       const requestInit: RequestInit = {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`
-        }
+        headers
       };
 
       if (body && method !== 'GET') {

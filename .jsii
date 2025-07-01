@@ -4121,7 +4121,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 267
+            "line": 277
           },
           "name": "associate3pApp"
         },
@@ -4131,7 +4131,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 207
+            "line": 209
           },
           "name": "createUserPoolClient",
           "returns": {
@@ -4147,7 +4147,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 235
+            "line": 241
           },
           "name": "createUserPoolGroups"
         }
@@ -4216,6 +4216,7 @@
             "line": 119
           },
           "name": "userPool",
+          "optional": true,
           "type": {
             "fqn": "aws-cdk-lib.aws_cognito.IUserPool"
           }
@@ -4229,6 +4230,7 @@
             "line": 121
           },
           "name": "userPoolClient",
+          "optional": true,
           "type": {
             "fqn": "aws-cdk-lib.aws_cognito.UserPoolClient"
           }
@@ -4282,21 +4284,6 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 94
-          },
-          "name": "cognito",
-          "type": {
-            "fqn": "@cxbuilder/flow-config.CognitoConfig"
-          }
-        },
-        {
-          "abstract": true,
-          "docs": {
-            "stability": "stable"
-          },
-          "immutable": true,
-          "locationInModule": {
-            "filename": "infrastructure/FlowConfigStack.ts",
             "line": 95
           },
           "name": "connectInstanceArn",
@@ -4318,6 +4305,22 @@
           "name": "prefix",
           "type": {
             "primitive": "string"
+          }
+        },
+        {
+          "abstract": true,
+          "docs": {
+            "stability": "stable"
+          },
+          "immutable": true,
+          "locationInModule": {
+            "filename": "infrastructure/FlowConfigStack.ts",
+            "line": 94
+          },
+          "name": "cognito",
+          "optional": true,
+          "type": {
+            "fqn": "@cxbuilder/flow-config.CognitoConfig"
           }
         },
         {
@@ -4529,6 +4532,6 @@
       "symbolId": "infrastructure/FlowConfigStack:VpcConfig"
     }
   },
-  "version": "1.0.2",
-  "fingerprint": "s/pJttg0EOQfAUhxIDKD7x/OTxGVUjbtfjbEp6/WNtY="
+  "version": "1.1.0",
+  "fingerprint": "q+2ZHgHrPqFXqs7F2DyjmDpGZWJMk0TWbpogDSzb0Fo="
 }

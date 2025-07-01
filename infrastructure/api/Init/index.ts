@@ -19,7 +19,7 @@ export class Init extends Construct {
     this.lambda = createLambda<InitEnv>(this, 'Handler', {
       environment: {
         stackName: stackName,
-        userPoolId: api.stack.props.cognito.userPoolId,
+        userPoolId: api.stack.props.cognito?.userPoolId,
       },
       timeout: Duration.seconds(15),
       initialPolicy: [

@@ -54,12 +54,22 @@ export const handler = async (
   logEvent(event, context);
   try {
     if (!response) {
-      const outputs = await getStackOutputs(env.stackName);
-      response = {
-        region: env.AWS_REGION ?? 'us-east-1',
-        userPoolId: env.userPoolId,
-        clientId: outputs.outputs.UserPoolClientId,
-      };
+      const region = env.AWS_REGION ?? 'us-east-1';
+      
+      if (env.userPoolId) {
+        // Cognito is configured - include auth fields
+        const outputs = await getStackOutputs(env.stackName);
+        response = {
+          region,
+          userPoolId: env.userPoolId,
+          clientId: outputs.outputs.UserPoolClientId,
+        };
+      } else {
+        // Cognito is not configured - only include region
+        response = {
+          region,
+        };
+      }
     }
 
     return respondObject(200, response);

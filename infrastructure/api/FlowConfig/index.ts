@@ -12,6 +12,7 @@ export class FlowConfig extends Construct {
     this.lambda = createLambda<FlowConfigEnv>(this, 'Handler', {
       environment: {
         FLOW_CONFIGS_TABLE_NAME: api.stack.table.tableName,
+        USER_POOL_ID: api.stack.props.cognito?.userPoolId,
       },
       alertTopic: api.stack.alertTopic,
     });

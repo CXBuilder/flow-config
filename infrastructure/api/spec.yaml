@@ -21,8 +21,6 @@ components:
       additionalProperties: false
       required:
         - region
-        - userPoolId
-        - clientId
       properties:
         region:
           type: string

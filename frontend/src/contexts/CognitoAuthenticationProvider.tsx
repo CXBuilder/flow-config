@@ -21,7 +21,7 @@ export const useTokenContext = () => useContext(CognitoAuthenticationContext);
 function CognitoAuthenticationProvider({ children }: { children: ReactNode }) {
   const { setAlert } = useAlert();
   const config = useContext(ConfigurationContext);
-  
+
   const REDIRECT_URL = getAppUrl('/popup.html');
 
   const [tokenProvider, setTokenProvider] = useState<TokenProvider | undefined>(
@@ -32,18 +32,27 @@ function CognitoAuthenticationProvider({ children }: { children: ReactNode }) {
   const [popupBlocked, setPopupBlocked] = useState<boolean>(false);
   const [codeVerifier, setCodeVerifier] = useState('');
 
+  // Check if Cognito is configured
+  const cognitoConfigured = config?.userPoolId && config?.clientId;
+
   useEffect(() => {
     if (config) {
-      const tokenProvider = new TokenProvider(
-        new EndpointProvider(
-          `https://cognito-idp.${config.region}.amazonaws.com/${config.userPoolId}/.well-known/openid-configuration`
-        ),
-        config.clientId,
-        REDIRECT_URL
-      );
-      setTokenProvider(tokenProvider);
+      if (cognitoConfigured) {
+        // Cognito is configured - create token provider
+        const tokenProvider = new TokenProvider(
+          new EndpointProvider(
+            `https://cognito-idp.${config.region}.amazonaws.com/${config.userPoolId}/.well-known/openid-configuration`
+          ),
+          config.clientId ?? '',
+          REDIRECT_URL
+        );
+        setTokenProvider(tokenProvider);
+      } else {
+        // Cognito is not configured - skip authentication
+        setInitialized(true);
+      }
     }
-  }, [config]);
+  }, [config, cognitoConfigured]);
 
   useEffect(() => {
     if (tokenProvider && !codeVerifier) {
@@ -102,8 +111,8 @@ function CognitoAuthenticationProvider({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {initialized && tokenProvider ? (
-        <CognitoAuthenticationContext.Provider value={tokenProvider}>
+      {initialized ? (
+        <CognitoAuthenticationContext.Provider value={tokenProvider!}>
           {children}
         </CognitoAuthenticationContext.Provider>
       ) : (

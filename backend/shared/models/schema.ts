@@ -261,8 +261,8 @@ export interface components {
         /** @description Provides run-time configuration to the frontend app */
         InitResponse: {
             region: string;
-            userPoolId: string;
-            clientId: string;
+            userPoolId?: string;
+            clientId?: string;
         };
         /** @description Describe the Connect user */
         User: {

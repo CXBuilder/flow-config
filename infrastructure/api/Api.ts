@@ -70,10 +70,19 @@ export class Api extends Construct {
     const yml = readFileSync(sourceFileName).toString();
     const spec = parse(yml);
 
-    const authorizer = spec.components.securitySchemes.CognitoAuthorizer;
-    authorizer['x-amazon-apigateway-authorizer'].providerARNs = [
-      stack.userPool.userPoolArn,
-    ];
+    if (stack.userPool) {
+      // Configure Cognito authorization if user pool exists
+      const authorizer = spec.components.securitySchemes.CognitoAuthorizer;
+      authorizer['x-amazon-apigateway-authorizer'].providerARNs = [
+        stack.userPool.userPoolArn,
+      ];
+    } else {
+      // Remove Cognito authorization when not configured
+      delete spec.components.securitySchemes.CognitoAuthorizer;
+      
+      // Remove security requirements from all endpoints
+      this.removeSecurityFromEndpoints(spec);
+    }
 
     // Helper function to set Lambda integration URI
     const setLambdaIntegration = (
@@ -113,6 +122,20 @@ export class Api extends Construct {
     flowConfigLambda.grantInvoke(apiGatewayPrincipal);
     previewSpeechLambda.grantInvoke(apiGatewayPrincipal);
     staticLambda.grantInvoke(apiGatewayPrincipal);
+  }
+
+  /**
+   * Remove security requirements from all endpoints when Cognito is not configured
+   */
+  private removeSecurityFromEndpoints(spec: any): void {
+    // Iterate through all paths and remove security requirements
+    Object.keys(spec.paths).forEach(path => {
+      Object.keys(spec.paths[path]).forEach(method => {
+        if (spec.paths[path][method].security) {
+          delete spec.paths[path][method].security;
+        }
+      });
+    });
   }
 
   /**

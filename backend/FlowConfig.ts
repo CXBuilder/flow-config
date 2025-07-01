@@ -36,21 +36,29 @@ export const handler = async (
     // Extract user claims from Cognito authorizer
     const claims = event.requestContext.authorizer?.claims;
 
-    if (!claims) {
+    // If Cognito is not enabled (no userPoolId), assume admin access
+    const cognitoEnabled = !!env.USER_POOL_ID;
+
+    if (cognitoEnabled && !claims) {
       return respondObject(401, new Error('Unauthorized'));
     }
 
+    // Create mock admin claims when Cognito is disabled
+    const effectiveClaims = cognitoEnabled
+      ? claims
+      : { 'cognito:groups': 'FlowConfigAdmin' };
+
     // Route to appropriate handler
     if (method === 'GET' && path === '/api/flow-config') {
-      return await listFlowConfigs(event, claims);
+      return await listFlowConfigs(event, effectiveClaims);
     } else if (method === 'GET' && pathParameters?.id) {
-      return await getFlowConfig(pathParameters.id, claims);
+      return await getFlowConfig(pathParameters.id, effectiveClaims);
     } else if (method === 'POST' && path === '/api/flow-config/preview') {
-      return await previewFlowConfig(event, claims);
+      return await previewFlowConfig(event, effectiveClaims);
     } else if (method === 'POST' && pathParameters?.id) {
-      return await saveFlowConfig(pathParameters.id, event, claims);
+      return await saveFlowConfig(pathParameters.id, event, effectiveClaims);
     } else if (method === 'DELETE' && pathParameters?.id) {
-      return await deleteFlowConfig(pathParameters.id, claims);
+      return await deleteFlowConfig(pathParameters.id, effectiveClaims);
     }
 
     return respondMessage(404, 'Not Found');
@@ -89,7 +97,11 @@ async function listFlowConfigs(
 
     for (const config of filteredConfigs) {
       // Check access level using user claims
-      const accessLevel = validateFlowConfigPermission(claims, config.id, 'Read');
+      const accessLevel = validateFlowConfigPermission(
+        claims,
+        config.id,
+        'Read'
+      );
       if (accessLevel) {
         resultItems.push({
           id: config.id,
@@ -112,7 +124,11 @@ async function getFlowConfig(
 ): Promise<APIGatewayProxyStructuredResultV2> {
   try {
     // Check permissions
-    const accessLevel = validateFlowConfigPermission(claims, flowConfigId, 'Read');
+    const accessLevel = validateFlowConfigPermission(
+      claims,
+      flowConfigId,
+      'Read'
+    );
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
@@ -203,16 +219,26 @@ async function saveFlowConfig(
     const action = existingConfig ? 'Edit' : 'Create';
 
     // Check permissions
-    const accessLevel = validateFlowConfigPermission(claims, flowConfigId, action);
+    const accessLevel = validateFlowConfigPermission(
+      claims,
+      flowConfigId,
+      action
+    );
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
 
     // For FlowConfigEdit users, validate they're only changing values, not structure
     if (accessLevel === 'Edit' && existingConfig) {
-      const structuralChangeError = validateEditOnlyChanges(existingConfig as FlowConfig, body);
+      const structuralChangeError = validateEditOnlyChanges(
+        existingConfig as FlowConfig,
+        body
+      );
       if (structuralChangeError) {
-        return respondMessage(403, `FlowConfigEdit users cannot make structural changes: ${structuralChangeError}`);
+        return respondMessage(
+          403,
+          `FlowConfigEdit users cannot make structural changes: ${structuralChangeError}`
+        );
       }
     }
 
@@ -237,7 +263,11 @@ async function deleteFlowConfig(
 ): Promise<APIGatewayProxyStructuredResultV2> {
   try {
     // Check permissions
-    const accessLevel = validateFlowConfigPermission(claims, flowConfigId, 'Delete');
+    const accessLevel = validateFlowConfigPermission(
+      claims,
+      flowConfigId,
+      'Delete'
+    );
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
@@ -326,7 +356,11 @@ async function previewFlowConfig(
     }
 
     // Check permissions for the flow config ID
-    const accessLevel = validateFlowConfigPermission(claims, flowConfig.id, 'Read');
+    const accessLevel = validateFlowConfigPermission(
+      claims,
+      flowConfig.id,
+      'Read'
+    );
     if (!accessLevel) {
       return respondMessage(403, 'Access denied');
     }
@@ -349,7 +383,10 @@ async function previewFlowConfig(
  * @param newConfig The new flow config being saved
  * @returns Error message if structural changes detected, null if only value changes
  */
-function validateEditOnlyChanges(existingConfig: FlowConfig, newConfig: FlowConfig): string | null {
+function validateEditOnlyChanges(
+  existingConfig: FlowConfig,
+  newConfig: FlowConfig
+): string | null {
   // Check if description changed (not allowed for Edit users)
   if (existingConfig.description !== newConfig.description) {
     return 'Cannot modify description';
@@ -358,18 +395,22 @@ function validateEditOnlyChanges(existingConfig: FlowConfig, newConfig: FlowConf
   // Check if variable keys changed (not allowed for Edit users)
   const existingVarKeys = Object.keys(existingConfig.variables || {}).sort();
   const newVarKeys = Object.keys(newConfig.variables || {}).sort();
-  
-  if (existingVarKeys.length !== newVarKeys.length || 
-      !existingVarKeys.every((key, index) => key === newVarKeys[index])) {
+
+  if (
+    existingVarKeys.length !== newVarKeys.length ||
+    !existingVarKeys.every((key, index) => key === newVarKeys[index])
+  ) {
     return 'Cannot add or remove variables';
   }
 
   // Check if prompt structure changed (not allowed for Edit users)
   const existingPromptKeys = Object.keys(existingConfig.prompts || {}).sort();
   const newPromptKeys = Object.keys(newConfig.prompts || {}).sort();
-  
-  if (existingPromptKeys.length !== newPromptKeys.length || 
-      !existingPromptKeys.every((key, index) => key === newPromptKeys[index])) {
+
+  if (
+    existingPromptKeys.length !== newPromptKeys.length ||
+    !existingPromptKeys.every((key, index) => key === newPromptKeys[index])
+  ) {
     return 'Cannot add or remove prompts';
   }
 
@@ -377,20 +418,19 @@ function validateEditOnlyChanges(existingConfig: FlowConfig, newConfig: FlowConf
   for (const promptName of existingPromptKeys) {
     const existingPrompt = existingConfig.prompts[promptName];
     const newPrompt = newConfig.prompts[promptName];
-    
+
     const existingLangs = Object.keys(existingPrompt || {});
     const newLangs = Object.keys(newPrompt || {});
-    
+
     // Check if any existing languages were removed (not allowed)
     for (const existingLang of existingLangs) {
       if (!newLangs.includes(existingLang)) {
         return `Cannot remove language ${existingLang} from prompt ${promptName}`;
       }
     }
-    
+
     // Adding languages and channels is allowed, so no further validation needed
   }
 
   return null; // No structural changes detected
 }
-
