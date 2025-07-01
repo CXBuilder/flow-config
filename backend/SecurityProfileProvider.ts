@@ -10,7 +10,7 @@ import { Context } from 'aws-lambda';
 import { AllowApplicationProps } from '../infrastructure/SecurityProfileProvider/SecurityProfileProvider.interface';
 import { logEvent, logger } from './shared/logger';
 
-const connectClient = new ConnectClient();
+const connectClient = new ConnectClient({ maxAttempts: 100 });
 
 const getProfileId = async (
   instanceId: string,

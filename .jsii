@@ -4085,7 +4085,7 @@
         },
         "locationInModule": {
           "filename": "infrastructure/FlowConfigStack.ts",
-          "line": 151
+          "line": 156
         },
         "parameters": [
           {
@@ -4111,7 +4111,7 @@
       "kind": "class",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 126
+        "line": 131
       },
       "methods": [
         {
@@ -4121,7 +4121,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 287
+            "line": 292
           },
           "name": "associate3pApp"
         },
@@ -4131,7 +4131,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 217
+            "line": 222
           },
           "name": "createUserPoolClient",
           "returns": {
@@ -4147,7 +4147,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 251
+            "line": 256
           },
           "name": "createUserPoolGroups"
         }
@@ -4161,7 +4161,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 146
+            "line": 151
           },
           "name": "appUrl",
           "type": {
@@ -4174,7 +4174,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 130
+            "line": 135
           },
           "name": "alertTopic",
           "type": {
@@ -4187,7 +4187,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 154
+            "line": 159
           },
           "name": "props",
           "type": {
@@ -4200,7 +4200,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 131
+            "line": 136
           },
           "name": "table",
           "type": {
@@ -4213,7 +4213,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 127
+            "line": 132
           },
           "name": "userPool",
           "optional": true,
@@ -4227,7 +4227,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 129
+            "line": 134
           },
           "name": "userPoolClient",
           "optional": true,
@@ -4264,7 +4264,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 108
+            "line": 113
           },
           "name": "alertEmails",
           "type": {
@@ -4333,7 +4333,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 123
+            "line": 128
           },
           "name": "globalTable",
           "optional": true,
@@ -4349,12 +4349,34 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 109
+            "line": 114
           },
           "name": "prod",
           "optional": true,
           "type": {
             "primitive": "boolean"
+          }
+        },
+        {
+          "abstract": true,
+          "docs": {
+            "stability": "stable",
+            "summary": "If provided, automatically grants security profiles access to the app."
+          },
+          "immutable": true,
+          "locationInModule": {
+            "filename": "infrastructure/FlowConfigStack.ts",
+            "line": 108
+          },
+          "name": "securityProfiles",
+          "optional": true,
+          "type": {
+            "collection": {
+              "elementtype": {
+                "primitive": "string"
+              },
+              "kind": "array"
+            }
           }
         },
         {
@@ -4367,7 +4389,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 116
+            "line": 121
           },
           "name": "vpc",
           "optional": true,
@@ -4549,5 +4571,5 @@
     }
   },
   "version": "1.1.0",
-  "fingerprint": "jEjpetrtvQpfaqQKaNmEMrWI6/udpmaWbqC1IYWch3A="
+  "fingerprint": "8JXvvZBfbssvU7OEZ0xD4b+5vgfppq932y44bSVlffg="
 }

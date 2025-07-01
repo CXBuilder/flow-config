@@ -103,6 +103,11 @@ export interface FlowConfigStackProps extends cdk.StackProps {
   readonly connectInstanceArn: string;
 
   /**
+   * If provided, automatically grants security profiles access to the app
+   */
+  readonly securityProfiles?: string[];
+
+  /**
    * Who to notify for unhandled exceptions
    */
   readonly alertEmails: string[];
@@ -286,7 +291,7 @@ export class FlowConfigStack extends cdk.Stack {
    */
   associate3pApp() {
     const {
-      props: { prefix, connectInstanceArn },
+      props: { prefix, connectInstanceArn, securityProfiles = [] },
       appUrl: url,
     } = this;
     let namespace = `cxbuilder.${prefix}`;
@@ -325,19 +330,20 @@ export class FlowConfigStack extends cdk.Stack {
       }
     );
 
-    const provider = new SecurityProfileProvider(
-      this,
-      'SecurityProfileProvider',
-      {
-        connectInstanceArn,
-      }
-    );
-    provider.node.addDependency(association);
+    if (securityProfiles.length) {
+      const provider = new SecurityProfileProvider(
+        this,
+        'SecurityProfileProvider',
+        {
+          connectInstanceArn,
+        }
+      );
+      provider.node.addDependency(association);
 
-    // Automatically associate with security profiles
-    const securityProfiles = ['Admin'];
-    for (const profile of securityProfiles) {
-      provider.allowApplication(`Allow${profile}`, profile, namespace);
+      // Automatically associate with security profiles
+      for (const profile of securityProfiles) {
+        provider.allowApplication(`Allow${profile}`, profile, namespace);
+      }
     }
   }
 

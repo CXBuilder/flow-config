@@ -1,4 +1,4 @@
-import { CustomResource, RemovalPolicy } from 'aws-cdk-lib';
+import { CustomResource, Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { IRole, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Function } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -33,6 +33,7 @@ export class SecurityProfileProvider extends Construct {
 
     this.handler = createLambda(this, 'Handler', {
       role: this.role,
+      timeout: Duration.minutes(15),
     });
 
     if (!this.role) {
@@ -62,7 +63,7 @@ export class SecurityProfileProvider extends Construct {
 
   /**
    * Grant a security profile access to a 3P application namespace
-   * At this time, the only permission available on the SDK is 'ACCESS'. ibliskavka 2024-10-31
+   * At this time, the only permission available on the SDK is 'ACCESS'. ibliskavka 2025-07-01
    */
   allowApplication(
     id: string,
