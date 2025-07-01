@@ -11,6 +11,7 @@ import {
   Alert,
 } from '@cloudscape-design/components';
 import { useApi } from '../hooks/useApi';
+import { usePermissions } from '../hooks/usePermissions';
 import FlowConfigDetail from './FlowConfigDetail';
 import {
   FlowConfigSummary,
@@ -35,6 +36,7 @@ export default function FlowConfigList() {
   } | null>(null);
 
   const { apiFetch } = useApi();
+  const { hasAccess, isAdmin } = usePermissions();
 
   const loadFlowConfigs = async () => {
     setLoading(true);
@@ -180,21 +182,27 @@ export default function FlowConfigList() {
             counter={`(${filteredItems.length})`}
             actions={
               <SpaceBetween direction="horizontal" size="xs">
-                <Button
-                  disabled={selectedItems.length === 0}
-                  onClick={() => setShowDeleteModal(true)}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={selectedItems.length !== 1}
-                  onClick={() => handleEdit(selectedItems[0])}
-                >
-                  Edit
-                </Button>
-                <Button variant="primary" onClick={handleCreate}>
-                  Create
-                </Button>
+                {isAdmin() && (
+                  <Button
+                    disabled={selectedItems.length === 0}
+                    onClick={() => setShowDeleteModal(true)}
+                  >
+                    Delete
+                  </Button>
+                )}
+                {hasAccess('Edit') && (
+                  <Button
+                    disabled={selectedItems.length !== 1}
+                    onClick={() => handleEdit(selectedItems[0])}
+                  >
+                    Edit
+                  </Button>
+                )}
+                {isAdmin() && (
+                  <Button variant="primary" onClick={handleCreate}>
+                    Create
+                  </Button>
+                )}
               </SpaceBetween>
             }
           >
@@ -230,7 +238,9 @@ export default function FlowConfigList() {
           <Box margin={{ vertical: 'xs' }} textAlign="center" color="inherit">
             <SpaceBetween size="m">
               <b>No flow configurations</b>
-              <Button onClick={handleCreate}>Create flow configuration</Button>
+              {isAdmin() && (
+                <Button onClick={handleCreate}>Create flow configuration</Button>
+              )}
             </SpaceBetween>
           </Box>
         }

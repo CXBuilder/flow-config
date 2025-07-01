@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { SpaceBetween, Alert } from '@cloudscape-design/components';
 import { useApi } from '../../hooks/useApi';
+import { usePermissions } from '../../hooks/usePermissions';
 import { FlowConfigDetailProps, PromptData, PreviewData } from './shared/types';
 import { FlowConfigActions } from './FlowConfigActions/FlowConfigActions';
 import { FlowConfigPreview } from './FlowConfigActions/FlowConfigPreview';
@@ -40,8 +41,11 @@ export default function FlowConfigDetail({
   const [previewChannel, setPreviewChannel] = useState('voice');
 
   const { apiFetch } = useApi();
+  const { canEdit, canMakeStructuralChanges } = usePermissions();
 
   const isEditing = !!flowConfigId;
+  const isReadOnly = !canEdit();
+  const canSave = canEdit();
 
   // Load existing flow config if editing
   useEffect(() => {
@@ -174,6 +178,7 @@ export default function FlowConfigDetail({
         previewLoading={previewLoading}
         flowConfigId={flowConfig.id}
         canPreview={canPreview}
+        canSave={canSave}
         onClose={onClose}
         onSave={handleSave}
         onPreview={handlePreview}
@@ -189,38 +194,50 @@ export default function FlowConfigDetail({
         flowConfig={flowConfig}
         isEditing={isEditing}
         selectedVoices={selectedVoices}
-        onUpdate={handleUpdate}
-        onAddVariable={() => setShowAddVariableModal(true)}
-        onAddPrompt={() => setShowAddPromptModal(true)}
-        onAddLanguage={(promptName) => setShowAddLanguageModal(promptName)}
+        onUpdate={isReadOnly ? () => {} : handleUpdate}
+        onAddVariable={
+          isReadOnly ? () => {} : () => setShowAddVariableModal(true)
+        }
+        onAddPrompt={isReadOnly ? () => {} : () => setShowAddPromptModal(true)}
+        onAddLanguage={
+          isReadOnly
+            ? () => {}
+            : (promptName) => setShowAddLanguageModal(promptName)
+        }
         onVoiceChange={handleVoiceChange}
+        canMakeStructuralChanges={canMakeStructuralChanges()}
+        isReadOnly={isReadOnly}
       />
 
-      {/* Modals */}
-      <AddVariableModal
-        visible={showAddVariableModal}
-        onDismiss={() => setShowAddVariableModal(false)}
-        onAdd={handleAddVariable}
-        existingKeys={Object.keys(flowConfig.variables)}
-      />
+      {/* Modals - Only show for users with edit permissions */}
+      {!isReadOnly && (
+        <>
+          <AddVariableModal
+            visible={showAddVariableModal}
+            onDismiss={() => setShowAddVariableModal(false)}
+            onAdd={handleAddVariable}
+            existingKeys={Object.keys(flowConfig.variables)}
+          />
 
-      <AddPromptModal
-        visible={showAddPromptModal}
-        onDismiss={() => setShowAddPromptModal(false)}
-        onAdd={handleAddPrompt}
-        existingPrompts={Object.keys(flowConfig.prompts)}
-      />
+          <AddPromptModal
+            visible={showAddPromptModal}
+            onDismiss={() => setShowAddPromptModal(false)}
+            onAdd={handleAddPrompt}
+            existingPrompts={Object.keys(flowConfig.prompts)}
+          />
 
-      {showAddLanguageModal && (
-        <AddLanguageModal
-          visible={!!showAddLanguageModal}
-          promptName={showAddLanguageModal}
-          onDismiss={() => setShowAddLanguageModal(null)}
-          onAdd={handleAddLanguageToPrompt}
-          existingLanguages={Object.keys(
-            flowConfig.prompts[showAddLanguageModal] || {}
+          {showAddLanguageModal && (
+            <AddLanguageModal
+              visible={!!showAddLanguageModal}
+              promptName={showAddLanguageModal}
+              onDismiss={() => setShowAddLanguageModal(null)}
+              onAdd={handleAddLanguageToPrompt}
+              existingLanguages={Object.keys(
+                flowConfig.prompts[showAddLanguageModal] || {}
+              )}
+            />
           )}
-        />
+        </>
       )}
 
       <FlowConfigPreview

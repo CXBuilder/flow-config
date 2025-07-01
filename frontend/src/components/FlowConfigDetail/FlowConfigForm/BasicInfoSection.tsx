@@ -12,12 +12,14 @@ interface BasicInfoSectionProps {
   flowConfig: FlowConfig;
   isEditing: boolean;
   onUpdate: (updates: Partial<FlowConfig>) => void;
+  readOnly?: boolean;
 }
 
 export function BasicInfoSection({
   flowConfig,
   isEditing,
   onUpdate,
+  readOnly = false,
 }: BasicInfoSectionProps) {
   return (
     <Container header={<Header variant="h2">Basic Information</Header>}>
@@ -45,6 +47,7 @@ export function BasicInfoSection({
               value={flowConfig.description}
               onChange={({ detail }) => onUpdate({ description: detail.value })}
               placeholder="e.g., Main customer service configuration"
+              readOnly={readOnly}
             />
           </FormField>
         </ColumnLayout>

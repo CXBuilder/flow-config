@@ -4016,7 +4016,7 @@
       "kind": "interface",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 23
+        "line": 24
       },
       "name": "CognitoConfig",
       "properties": [
@@ -4029,7 +4029,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 29
+            "line": 30
           },
           "name": "domain",
           "type": {
@@ -4044,7 +4044,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 24
+            "line": 25
           },
           "name": "userPoolId",
           "type": {
@@ -4061,7 +4061,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 34
+            "line": 35
           },
           "name": "ssoProviderName",
           "optional": true,
@@ -4085,7 +4085,7 @@
         },
         "locationInModule": {
           "filename": "infrastructure/FlowConfigStack.ts",
-          "line": 142
+          "line": 143
         },
         "parameters": [
           {
@@ -4111,7 +4111,7 @@
       "kind": "class",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 117
+        "line": 118
       },
       "methods": [
         {
@@ -4121,7 +4121,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 233
+            "line": 267
           },
           "name": "associate3pApp"
         },
@@ -4131,7 +4131,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 205
+            "line": 207
           },
           "name": "createUserPoolClient",
           "returns": {
@@ -4139,6 +4139,17 @@
               "fqn": "aws-cdk-lib.aws_cognito.UserPoolClient"
             }
           }
+        },
+        {
+          "docs": {
+            "stability": "stable",
+            "summary": "Create Cognito User Groups for role-based access control."
+          },
+          "locationInModule": {
+            "filename": "infrastructure/FlowConfigStack.ts",
+            "line": 235
+          },
+          "name": "createUserPoolGroups"
         }
       ],
       "name": "FlowConfigStack",
@@ -4150,7 +4161,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 137
+            "line": 138
           },
           "name": "appUrl",
           "type": {
@@ -4163,7 +4174,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 121
+            "line": 122
           },
           "name": "alertTopic",
           "type": {
@@ -4176,7 +4187,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 145
+            "line": 146
           },
           "name": "props",
           "type": {
@@ -4189,7 +4200,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 122
+            "line": 123
           },
           "name": "table",
           "type": {
@@ -4202,7 +4213,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 118
+            "line": 119
           },
           "name": "userPool",
           "type": {
@@ -4215,7 +4226,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 120
+            "line": 121
           },
           "name": "userPoolClient",
           "type": {
@@ -4238,7 +4249,7 @@
       "kind": "interface",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 88
+        "line": 89
       },
       "name": "FlowConfigStackProps",
       "properties": [
@@ -4251,7 +4262,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 99
+            "line": 100
           },
           "name": "alertEmails",
           "type": {
@@ -4271,7 +4282,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 93
+            "line": 94
           },
           "name": "cognito",
           "type": {
@@ -4286,7 +4297,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 94
+            "line": 95
           },
           "name": "connectInstanceArn",
           "type": {
@@ -4302,7 +4313,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 92
+            "line": 93
           },
           "name": "prefix",
           "type": {
@@ -4319,7 +4330,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 114
+            "line": 115
           },
           "name": "globalTable",
           "optional": true,
@@ -4335,7 +4346,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 100
+            "line": 101
           },
           "name": "prod",
           "optional": true,
@@ -4353,7 +4364,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 107
+            "line": 108
           },
           "name": "vpc",
           "optional": true,
@@ -4375,7 +4386,7 @@
       "kind": "interface",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 65
+        "line": 66
       },
       "name": "GlobalTableConfig",
       "properties": [
@@ -4388,7 +4399,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 69
+            "line": 70
           },
           "name": "isPrimaryRegion",
           "type": {
@@ -4404,7 +4415,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 75
+            "line": 76
           },
           "name": "replicaRegions",
           "optional": true,
@@ -4431,7 +4442,7 @@
       "kind": "interface",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 40
+        "line": 41
       },
       "name": "VpcConfig",
       "properties": [
@@ -4444,7 +4455,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 49
+            "line": 50
           },
           "name": "lambdaSecurityGroupIds",
           "type": {
@@ -4465,7 +4476,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 54
+            "line": 55
           },
           "name": "privateSubnetIds",
           "type": {
@@ -4486,7 +4497,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 59
+            "line": 60
           },
           "name": "vpcEndpointSecurityGroupIds",
           "type": {
@@ -4507,7 +4518,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 44
+            "line": 45
           },
           "name": "vpcId",
           "type": {
@@ -4519,5 +4530,5 @@
     }
   },
   "version": "1.0.2",
-  "fingerprint": "w9Ycg9k4gI4a60byR9Aq9YQSosFtZL/sCppEdcuzvDU="
+  "fingerprint": "s/pJttg0EOQfAUhxIDKD7x/OTxGVUjbtfjbEp6/WNtY="
 }

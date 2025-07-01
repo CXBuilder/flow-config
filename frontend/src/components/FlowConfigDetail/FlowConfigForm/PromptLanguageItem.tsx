@@ -26,6 +26,7 @@ interface PromptLanguageItemProps {
     updates: { voice?: string; chat?: string }
   ) => void;
   onVoiceChange: (language: string, voiceId: string) => void;
+  isReadOnly?: boolean;
 }
 
 export function PromptLanguageItem({
@@ -35,6 +36,7 @@ export function PromptLanguageItem({
   selectedVoices,
   onUpdatePrompt,
   onVoiceChange,
+  isReadOnly = false,
 }: PromptLanguageItemProps) {
   const getSelectedVoice = (language: string): string => {
     return selectedVoices[language] || getDefaultVoice(language);
@@ -50,6 +52,7 @@ export function PromptLanguageItem({
               onUpdatePrompt(promptName, language, { voice: detail.value });
             }}
             rows={3}
+            readOnly={isReadOnly}
           />
         </FormField>
         <FormField label="Chat Content (Optional)" stretch>
@@ -59,6 +62,7 @@ export function PromptLanguageItem({
               onUpdatePrompt(promptName, language, { chat: detail.value });
             }}
             rows={2}
+            readOnly={isReadOnly}
           />
         </FormField>
         <ColumnLayout columns={2}>

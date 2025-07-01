@@ -71,7 +71,7 @@ const makeEvent = (
       authorizer: {
         claims: claims || {
           sub: 'test-user-123',
-          'cognito:groups': 'Administrators',
+          'cognito:groups': 'FlowConfigAdmin',
         },
       },
     },

@@ -16,6 +16,8 @@ interface PromptsSectionProps {
   onAddLanguage: (promptName: string) => void;
   onRemovePrompt: (promptName: string) => void;
   onVoiceChange: (language: string, voiceId: string) => void;
+  canMakeStructuralChanges?: boolean;
+  isReadOnly?: boolean;
 }
 
 export function PromptsSection({
@@ -26,6 +28,8 @@ export function PromptsSection({
   onAddLanguage,
   onRemovePrompt,
   onVoiceChange,
+  canMakeStructuralChanges = true,
+  isReadOnly = false,
 }: PromptsSectionProps) {
   const handleUpdatePrompt = (
     promptName: string,
@@ -52,9 +56,11 @@ export function PromptsSection({
       headerText="Prompts"
       headerCounter={`(${Object.keys(flowConfig.prompts).length})`}
       headerActions={
-        <Button onClick={onAddPrompt} iconName="add-plus">
-          Add Prompt
-        </Button>
+        canMakeStructuralChanges && (
+          <Button onClick={onAddPrompt} iconName="add-plus">
+            Add Prompt
+          </Button>
+        )
       }
       defaultExpanded={true}
     >
@@ -77,20 +83,24 @@ export function PromptsSection({
                     Object.keys(promptData).length
                   } languages)`}
                   headerActions={
-                    <SpaceBetween direction="horizontal" size="xs">
-                      <Button
-                        onClick={() => onAddLanguage(promptName)}
-                        iconName="add-plus"
-                        variant="icon"
-                        ariaLabel={`Add language to ${promptName}`}
-                      />
-                      <Button
-                        variant="icon"
-                        iconName="remove"
-                        onClick={() => onRemovePrompt(promptName)}
-                        ariaLabel={`Remove prompt ${promptName}`}
-                      />
-                    </SpaceBetween>
+                    !isReadOnly && (
+                      <SpaceBetween direction="horizontal" size="xs">
+                        <Button
+                          onClick={() => onAddLanguage(promptName)}
+                          iconName="add-plus"
+                          variant="icon"
+                          ariaLabel={`Add language to ${promptName}`}
+                        />
+                        {canMakeStructuralChanges && (
+                          <Button
+                            variant="icon"
+                            iconName="remove"
+                            onClick={() => onRemovePrompt(promptName)}
+                            ariaLabel={`Remove prompt ${promptName}`}
+                          />
+                        )}
+                      </SpaceBetween>
+                    )
                   }
                   defaultExpanded={false}
                 >
@@ -104,6 +114,7 @@ export function PromptsSection({
                         selectedVoices={selectedVoices}
                         onUpdatePrompt={handleUpdatePrompt}
                         onVoiceChange={onVoiceChange}
+                        isReadOnly={isReadOnly}
                       />
                     ))}
                   </SpaceBetween>
