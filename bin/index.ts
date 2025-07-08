@@ -12,12 +12,12 @@ const config: Record<string, FlowConfigStackProps> = {
       account: '779926948221',
     },
     cognito: {
-      domain: 'https://demo-cxbuilder.auth.us-east-1.amazoncognito.com',
+      domain: 'https://cxbuilder-ivan.auth.us-east-1.amazoncognito.com',
       userPoolId: 'us-east-1_eug3IxCN7',
       ssoProviderName: 'CXBuilder-SSO',
     },
     connectInstanceArn:
-      'arn:aws:connect:us-east-1:779926948221:instance/f7a0dc57-5e87-49cb-a724-bfb6a661a55f',
+      'arn:aws:connect:us-east-1:779926948221:instance/ee0bc407-15a9-40d4-8eeb-3a90f53e3269',
     alertEmails: ['ivan@cxbuilder.ai'],
   },
 };
