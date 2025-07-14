@@ -6,17 +6,20 @@ import {
   SpaceBetween,
   Link,
   TextContent,
+  Tabs,
 } from '@cloudscape-design/components';
 import FlowConfigList from './components/FlowConfigList';
 import { NoPermissions } from './components/NoPermissions';
+import { Settings } from './components/Settings';
 import { usePermissions } from './hooks/usePermissions';
 import { useContext, useState, useEffect } from 'react';
 import { CognitoAuthenticationContext } from './contexts/CognitoAuthenticationProvider';
 
 function App() {
-  const { hasAnyAccess } = usePermissions();
+  const { hasAnyAccess, isAdmin } = usePermissions();
   const tokenProvider = useContext(CognitoAuthenticationContext);
   const [userName, setUserName] = useState<string>();
+  const [activeTab, setActiveTab] = useState('flow-configs');
 
   useEffect(() => {
     if (tokenProvider) {
@@ -41,7 +44,26 @@ function App() {
         <Box padding="l">
           <ContentLayout>
             {hasAnyAccess() ? (
-              <FlowConfigList />
+              isAdmin() ? (
+                <Tabs
+                  activeTabId={activeTab}
+                  onChange={({ detail }) => setActiveTab(detail.activeTabId)}
+                  tabs={[
+                    {
+                      label: 'Flow Configurations',
+                      id: 'flow-configs',
+                      content: <FlowConfigList />,
+                    },
+                    {
+                      label: 'Settings',
+                      id: 'settings',
+                      content: <Settings />,
+                    },
+                  ]}
+                />
+              ) : (
+                <FlowConfigList />
+              )
             ) : (
               <NoPermissions userName={userName} />
             )}
