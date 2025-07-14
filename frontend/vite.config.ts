@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-const baseUrl = 'https://z9fc2elwe2.execute-api.us-east-1.amazonaws.com/prod';
+const baseUrl = 'https://5peztn1g5d.execute-api.us-east-1.amazonaws.com/prod';
 
 console.log(`Vite is proxying localhost:3000/api to ${baseUrl}/api.`);
 console.log(
