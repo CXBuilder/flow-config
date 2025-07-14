@@ -14,7 +14,7 @@ export class GetConfig extends Construct {
     const { connectInstanceArn, prefix } = stack.props;
 
     this.function = createLambda<GetConfigEnv>(this, 'Handler', {
-      functionName: `${prefix}-get-config`,
+      functionName: prefix,
       environment: {
         FLOW_CONFIGS_TABLE_NAME: stack.table.tableName,
       },

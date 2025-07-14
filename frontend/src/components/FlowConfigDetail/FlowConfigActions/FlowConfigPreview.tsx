@@ -95,7 +95,7 @@ export function FlowConfigPreview({
             header={
               <Header 
                 variant="h3"
-                description="These are the exact key-value pairs that will be returned when Amazon Connect contact flows call the get-config Lambda function with the selected language and channel."
+                description="These are the exact key-value pairs that will be returned when Amazon Connect contact flows call the GetConfig Lambda function with the selected language and channel."
               >
                 Flow Config Data
               </Header>

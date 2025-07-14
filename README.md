@@ -162,9 +162,7 @@ The Lambda function handles Amazon Connect Contact Flow events with the followin
     },
     "ContactData": {
       "Channel": "VOICE",
-      "Attributes": {
-        "lang": "en-US"
-      }
+      "LanguageCode": "en-US"
     }
   }
 }
@@ -180,7 +178,7 @@ The Lambda function handles Amazon Connect Contact Flow events with the followin
 2. **Optional Language Selection** (in order of precedence):
 
    - `Details.Parameters.lang` (highest priority)
-   - `Details.ContactData.Attributes.lang`
+   - `Details.ContactData.LanguageCode`
    - Defaults to `"en-US"`
 
 3. **Channel Detection**:
@@ -227,7 +225,7 @@ For direct testing or non-Connect invocation:
 ### Setting Up in Contact Flow
 
 1. **Add "Invoke AWS Lambda function" block** to your contact flow
-2. **Select the GetConfig Lambda function** (deployed as `${prefix}-get-config`)
+2. **Select the GetConfig Lambda function** (deployed as `${prefix}`)
 3. **Configure parameters**:
 
 ```json

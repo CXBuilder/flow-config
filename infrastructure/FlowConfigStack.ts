@@ -88,7 +88,8 @@ export interface ResolvedVpcConfig {
 
 export interface FlowConfigStackProps extends cdk.StackProps {
   /**
-   * Used for resource naming
+   * Used for resource naming. Will also be the name of the Connect Lambda
+   * @example `cxbuilder-flow-config`
    */
   readonly prefix: string;
   readonly cognito: CognitoConfig;
