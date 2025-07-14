@@ -136,8 +136,7 @@ export class FlowConfigStack extends cdk.Stack {
   }
 
   get appUrl(): string {
-    const { region } = cdk.Stack.of(this);
-    return `https://${this.api.restApi.restApiId}.execute-api.${region}.amazonaws.com/prod`;
+    return this.api.url;
   }
 
   constructor(

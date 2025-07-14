@@ -27,8 +27,10 @@ import { Users } from './Users';
 import { Static } from './Static';
 
 export class Api extends Construct {
-  staticHosting: Static;
-  restApi: SpecRestApi;
+  readonly staticHosting: Static;
+  readonly restApi: SpecRestApi;
+  readonly vpcEndpoint?: InterfaceVpcEndpoint;
+  readonly url: string;
 
   constructor(public stack: FlowConfigStack) {
     super(stack, 'Api');
@@ -44,12 +46,16 @@ export class Api extends Construct {
           endpointConfiguration: {
             types: [EndpointType.PRIVATE],
             vpcEndpoints: [
-              new InterfaceVpcEndpoint(this, 'ApiVpcEndpoint', {
-                vpc: vpcConfig.vpc,
-                service: InterfaceVpcEndpointAwsService.APIGATEWAY,
-                subnets: { subnets: vpcConfig.privateSubnets },
-                securityGroups: vpcConfig.vpcEndpointSecurityGroups,
-              }),
+              (this.vpcEndpoint = new InterfaceVpcEndpoint(
+                this,
+                'ApiVpcEndpoint',
+                {
+                  vpc: vpcConfig.vpc,
+                  service: InterfaceVpcEndpointAwsService.APIGATEWAY,
+                  subnets: { subnets: vpcConfig.privateSubnets },
+                  securityGroups: vpcConfig.vpcEndpointSecurityGroups,
+                }
+              )),
             ],
           },
           policy: this.createVpcEndpointPolicy(vpcConfig.vpc.vpcId),
@@ -113,6 +119,10 @@ export class Api extends Construct {
     flowConfigLambda.grantInvoke(apiGatewayPrincipal);
     previewSpeechLambda.grantInvoke(apiGatewayPrincipal);
     staticLambda.grantInvoke(apiGatewayPrincipal);
+
+    this.url = this.vpcEndpoint
+      ? `https://${this.restApi.restApiId}-${this.vpcEndpoint.vpcEndpointId}.execute-api.${stack.region}.amazonaws.com/prod`
+      : `https://${this.restApi.restApiId}.execute-api.${stack.region}.amazonaws.com/prod`;
   }
 
   /**
