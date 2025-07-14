@@ -74,8 +74,9 @@ export function PromptsSection({
               </Box>
             </Box>
           ) : (
-            Object.entries(flowConfig.prompts).map(
-              ([promptName, promptData]) => (
+            Object.entries(flowConfig.prompts)
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([promptName, promptData]) => (
                 <ExpandableSection
                   key={promptName}
                   headerText={promptName}
@@ -105,7 +106,9 @@ export function PromptsSection({
                   defaultExpanded={false}
                 >
                   <SpaceBetween direction="vertical" size="s">
-                    {Object.entries(promptData).map(([language, content]) => (
+                    {Object.entries(promptData)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([language, content]) => (
                       <PromptLanguageItem
                         key={language}
                         promptName={promptName}

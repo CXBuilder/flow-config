@@ -307,11 +307,16 @@ export default function FlowConfigList() {
       item.description?.toLowerCase().includes(filteringText.toLowerCase())
   );
 
+  // Sort items alphabetically by ID
+  const sortedItems = filteredItems.sort((a, b) => 
+    a.id!.localeCompare(b.id!)
+  );
+
   // Pagination
   const pageSize = 10;
   const startIndex = (currentPageIndex - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const paginatedItems = filteredItems.slice(startIndex, endIndex);
+  const paginatedItems = sortedItems.slice(startIndex, endIndex);
 
   const columnDefinitions = [
     {
@@ -372,7 +377,7 @@ export default function FlowConfigList() {
         }}
         header={
           <Header
-            counter={`(${filteredItems.length})`}
+            counter={`(${sortedItems.length})`}
             actions={
               <SpaceBetween direction="horizontal" size="xs">
                 {isAdmin() && (
