@@ -45,10 +45,16 @@ export function createLambda<TEnv>(
     // Try alternative location in ../dist/backend
     codeLocation = resolve(__dirname, '..', 'dist', 'backend', backendId);
     expectedIndexFile = resolve(codeLocation, 'index.js');
-    
+
     if (!existsSync(expectedIndexFile)) {
       throw new Error(
-        `Lambda function ${backendId} bundled code not found at: ${expectedIndexFile} or ${resolve(__dirname, '..', 'backend', backendId, 'index.js')}. ` +
+        `Lambda function ${backendId} bundled code not found at: ${expectedIndexFile} or ${resolve(
+          __dirname,
+          '..',
+          'backend',
+          backendId,
+          'index.js'
+        )}. ` +
           'Please run "npm run build:lambdas" to bundle the Lambda functions.'
       );
     }
@@ -65,10 +71,6 @@ export function createLambda<TEnv>(
   // See: https://docs.powertools.aws.dev/lambda/typescript/latest/#lambda-layer
   const powertoolsLayerArn = `arn:aws:lambda:${region}:094274105915:layer:AWSLambdaPowertoolsTypeScriptV2:22`;
 
-  // Check if we're in a FlowConfigStack and get VPC configuration
-  const stack = Stack.of(scope) as FlowConfigStack;
-  const vpcConfig = stack._getResolvedVpcConfig();
-
   const func = new Function(scope, `${id}Function`, {
     // Apply defaults
     handler: 'index.handler',
@@ -84,12 +86,6 @@ export function createLambda<TEnv>(
         powertoolsLayerArn
       ),
     ],
-    // VPC configuration if provided
-    ...(vpcConfig && {
-      vpc: vpcConfig.vpc,
-      vpcSubnets: { subnets: vpcConfig.privateSubnets },
-      securityGroups: vpcConfig.lambdaSecurityGroups,
-    }),
     // Apply overrides
     ...props,
     // Ensure that the log retention custom resource is not created
@@ -112,9 +108,7 @@ export function createLambda<TEnv>(
   // To constrain LogGroup permissions further, you can use a static functionName with log.grantWrite
   func.role?.addManagedPolicy(
     ManagedPolicy.fromAwsManagedPolicyName(
-      vpcConfig
-        ? 'service-role/AWSLambdaVPCAccessExecutionRole'
-        : 'service-role/AWSLambdaBasicExecutionRole'
+      'service-role/AWSLambdaBasicExecutionRole'
     )
   );
 

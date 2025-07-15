@@ -4111,7 +4111,7 @@
       "kind": "class",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 119
+        "line": 132
       },
       "methods": [
         {
@@ -4161,7 +4161,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 139
+            "line": 152
           },
           "name": "appUrl",
           "type": {
@@ -4174,7 +4174,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 123
+            "line": 136
           },
           "name": "alertTopic",
           "type": {
@@ -4200,7 +4200,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 124
+            "line": 137
           },
           "name": "table",
           "type": {
@@ -4213,7 +4213,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 120
+            "line": 133
           },
           "name": "userPool",
           "optional": true,
@@ -4227,7 +4227,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 122
+            "line": 135
           },
           "name": "userPoolClient",
           "optional": true,
@@ -4264,7 +4264,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 101
+            "line": 114
           },
           "name": "alertEmails",
           "type": {
@@ -4284,22 +4284,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 95
-          },
-          "name": "cognito",
-          "type": {
-            "fqn": "@cxbuilder/flow-config.CognitoConfig"
-          }
-        },
-        {
-          "abstract": true,
-          "docs": {
-            "stability": "stable"
-          },
-          "immutable": true,
-          "locationInModule": {
-            "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 96
+            "line": 104
           },
           "name": "connectInstanceArn",
           "type": {
@@ -4317,7 +4302,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 94
+            "line": 102
           },
           "name": "prefix",
           "type": {
@@ -4332,7 +4317,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 102
+            "line": 103
           },
           "name": "cognito",
           "optional": true,
@@ -4350,7 +4335,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 116
+            "line": 129
           },
           "name": "globalTable",
           "optional": true,
@@ -4366,7 +4351,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 102
+            "line": 115
           },
           "name": "prod",
           "optional": true,
@@ -4383,7 +4368,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 108
+            "line": 109
           },
           "name": "securityProfiles",
           "optional": true,
@@ -4406,7 +4391,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 109
+            "line": 122
           },
           "name": "vpc",
           "optional": true,
@@ -4588,5 +4573,5 @@
     }
   },
   "version": "2.0.0",
-  "fingerprint": "Du7JjZ8YaClUwK+4ARCakoN19KX1/QKZmrpJUKPHNhc="
+  "fingerprint": "lDCTPw5n6j+v90Ewdk4dCeSIPb3qF1QGN06ZFB4dzjw="
 }
