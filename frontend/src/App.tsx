@@ -10,7 +10,7 @@ import {
 } from '@cloudscape-design/components';
 import FlowConfigList from './components/FlowConfigList';
 import { NoPermissions } from './components/NoPermissions';
-import { Settings } from './components/Settings';
+import { AdminSettings } from './components/Settings';
 import { usePermissions } from './hooks/usePermissions';
 import { useContext, useState, useEffect } from 'react';
 import { CognitoAuthenticationContext } from './contexts/CognitoAuthenticationProvider';
@@ -23,11 +23,14 @@ function App() {
 
   useEffect(() => {
     if (tokenProvider) {
-      tokenProvider.getIdTokenPayload().then((token) => {
-        setUserName(token['cognito:username'] || token.email);
-      }).catch((error) => {
-        console.error('Failed to get user name:', error);
-      });
+      tokenProvider
+        .getIdTokenPayload()
+        .then((token) => {
+          setUserName(token['cognito:username'] || token.email);
+        })
+        .catch((error) => {
+          console.error('Failed to get user name:', error);
+        });
     }
   }, [tokenProvider]);
 
@@ -57,7 +60,7 @@ function App() {
                     {
                       label: 'Settings',
                       id: 'settings',
-                      content: <Settings />,
+                      content: <AdminSettings />,
                     },
                   ]}
                 />

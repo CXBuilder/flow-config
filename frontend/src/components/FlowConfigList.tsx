@@ -19,6 +19,7 @@ import {
   FlowConfigList as FlowConfigListType,
   FlowConfig,
 } from '../shared';
+import SettingsProvider from '../contexts/SettingsProvider';
 
 export default function FlowConfigList() {
   const [flowConfigs, setFlowConfigs] = useState<FlowConfigSummary[]>([]);
@@ -126,12 +127,14 @@ export default function FlowConfigList() {
         );
         return result;
       });
-      
+
       const fullFlowConfigs = await Promise.all(exportPromises);
-      
+
       // Filter out any failed requests
-      const validConfigs = fullFlowConfigs.filter(config => config !== null && config !== undefined);
-      
+      const validConfigs = fullFlowConfigs.filter(
+        (config) => config !== null && config !== undefined
+      );
+
       if (validConfigs.length === 0) {
         setAlert({
           type: 'error',
@@ -139,15 +142,19 @@ export default function FlowConfigList() {
         });
         return;
       }
-      
+
       // Create filename with timestamp and count
       const now = new Date();
-      const timestamp = now.toISOString().slice(0, 16).replace('T', '-').replace(':', '');
+      const timestamp = now
+        .toISOString()
+        .slice(0, 16)
+        .replace('T', '-')
+        .replace(':', '');
       const filename = `flow-configs-${validConfigs.length}-items-${timestamp}.json`;
-      
+
       // Create and download file as simple array
       const blob = new Blob([JSON.stringify(validConfigs, null, 2)], {
-        type: 'application/json'
+        type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -157,17 +164,17 @@ export default function FlowConfigList() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
+
       setAlert({
         type: 'success',
         message: `Successfully exported ${validConfigs.length} flow configuration(s) to ${filename}`,
       });
-      
     } catch (error) {
       console.error('Export error:', error);
       setAlert({
         type: 'error',
-        message: 'Failed to export selected flow configurations. Please try again.',
+        message:
+          'Failed to export selected flow configurations. Please try again.',
       });
     }
   };
@@ -178,58 +185,68 @@ export default function FlowConfigList() {
     input.type = 'file';
     input.accept = '.json';
     input.style.display = 'none';
-    
+
     input.onchange = async (event) => {
       const file = (event.target as HTMLInputElement).files?.[0];
       if (!file) return;
-      
+
       try {
         const text = await file.text();
         const parsedData = JSON.parse(text);
-        
+
         // Validate import data structure - expect simple array or legacy format
         let flowConfigs: any[];
-        
+
         if (Array.isArray(parsedData)) {
           // New format: simple array
           flowConfigs = parsedData;
-        } else if (parsedData.flowConfigs && Array.isArray(parsedData.flowConfigs)) {
+        } else if (
+          parsedData.flowConfigs &&
+          Array.isArray(parsedData.flowConfigs)
+        ) {
           // Legacy format: wrapped in metadata object
           flowConfigs = parsedData.flowConfigs;
         } else {
-          throw new Error('Invalid import file format. Expected a JSON array of flow configurations.');
+          throw new Error(
+            'Invalid import file format. Expected a JSON array of flow configurations.'
+          );
         }
-        
+
         if (flowConfigs.length === 0) {
           throw new Error('Import file contains no flow configurations.');
         }
-        
+
         // Additional validation for FlowConfig structure
-        const hasValidStructure = flowConfigs.every((config: any) => 
-          config.id && 
-          config.description !== undefined && 
-          config.variables !== undefined && 
-          config.prompts !== undefined
+        const hasValidStructure = flowConfigs.every(
+          (config: any) =>
+            config.id &&
+            config.description !== undefined &&
+            config.variables !== undefined &&
+            config.prompts !== undefined
         );
-        
+
         if (!hasValidStructure) {
-          throw new Error('Invalid flow configuration structure in import file.');
+          throw new Error(
+            'Invalid flow configuration structure in import file.'
+          );
         }
-        
+
         // Store validated data and show confirmation modal
         setImportData(flowConfigs as FlowConfig[]);
         setShowImportModal(true);
-        
       } catch (error) {
         console.error('Import error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Failed to process import file';
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Failed to process import file';
         setAlert({
           type: 'error',
           message: `Import failed: ${errorMessage}`,
         });
       }
     };
-    
+
     document.body.appendChild(input);
     input.click();
     document.body.removeChild(input);
@@ -252,7 +269,11 @@ export default function FlowConfigList() {
           successCount++;
         } catch (error) {
           errorCount++;
-          errors.push(`Failed to import "${config.id}": ${error instanceof Error ? error.message : 'Unknown error'}`);
+          errors.push(
+            `Failed to import "${config.id}": ${
+              error instanceof Error ? error.message : 'Unknown error'
+            }`
+          );
           console.error(`Import error for ${config.id}:`, error);
         }
       }
@@ -282,7 +303,6 @@ export default function FlowConfigList() {
 
       // Refresh the list to show imported items
       await loadFlowConfigs();
-      
     } catch (error) {
       setAlert({
         type: 'error',
@@ -308,9 +328,7 @@ export default function FlowConfigList() {
   );
 
   // Sort items alphabetically by ID
-  const sortedItems = filteredItems.sort((a, b) => 
-    a.id!.localeCompare(b.id!)
-  );
+  const sortedItems = filteredItems.sort((a, b) => a.id!.localeCompare(b.id!));
 
   // Pagination
   const pageSize = 10;
@@ -351,7 +369,7 @@ export default function FlowConfigList() {
   ];
 
   return (
-    <>
+    <SettingsProvider>
       <Table
         columnDefinitions={columnDefinitions}
         items={paginatedItems}
@@ -408,13 +426,13 @@ export default function FlowConfigList() {
                         text: 'Export Selected',
                         id: 'export',
                         iconName: 'download',
-                        disabled: selectedItems.length === 0
+                        disabled: selectedItems.length === 0,
                       },
                       {
                         text: 'Import',
                         id: 'import',
-                        iconName: 'upload'
-                      }
+                        iconName: 'upload',
+                      },
                     ]}
                     variant="normal"
                     onItemClick={({ detail }) => {
@@ -464,7 +482,9 @@ export default function FlowConfigList() {
             <SpaceBetween size="m">
               <b>No flow configurations</b>
               {isAdmin() && (
-                <Button onClick={handleCreate}>Create flow configuration</Button>
+                <Button onClick={handleCreate}>
+                  Create flow configuration
+                </Button>
               )}
             </SpaceBetween>
           </Box>
@@ -564,7 +584,8 @@ export default function FlowConfigList() {
       >
         <SpaceBetween direction="vertical" size="m">
           <Alert type="warning">
-            <strong>Warning:</strong> Importing will overwrite any existing flow configurations with the same IDs.
+            <strong>Warning:</strong> Importing will overwrite any existing flow
+            configurations with the same IDs.
           </Alert>
           <Box variant="span">
             Are you sure you want to import {importData.length} flow
@@ -584,6 +605,6 @@ export default function FlowConfigList() {
           )}
         </SpaceBetween>
       </Modal>
-    </>
+    </SettingsProvider>
   );
 }

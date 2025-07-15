@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS: Settings = {
     {
       code: 'en-US',
       name: 'English (US)',
-      voices: ['Joanna', 'Matthew'],
+      voices: ['Joanna'],
     },
   ],
 };

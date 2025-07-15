@@ -9,7 +9,7 @@ import { FlowConfigForm } from './FlowConfigForm/FlowConfigForm';
 import {
   AddVariableModal,
   AddPromptModal,
-  AddLanguageModal,
+  AddLocaleModal,
 } from './FlowConfigModals';
 import { FlowConfig } from '../../shared';
 
@@ -227,12 +227,12 @@ export default function FlowConfigDetail({
           />
 
           {showAddLanguageModal && (
-            <AddLanguageModal
+            <AddLocaleModal
               visible={!!showAddLanguageModal}
               promptName={showAddLanguageModal}
               onDismiss={() => setShowAddLanguageModal(null)}
               onAdd={handleAddLanguageToPrompt}
-              existingLanguages={Object.keys(
+              existingLocales={Object.keys(
                 flowConfig.prompts[showAddLanguageModal] || {}
               )}
             />

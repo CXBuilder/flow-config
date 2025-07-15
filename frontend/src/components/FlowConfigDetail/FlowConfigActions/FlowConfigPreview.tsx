@@ -10,8 +10,10 @@ import {
   ColumnLayout,
   Table,
 } from '@cloudscape-design/components';
-import { LANGUAGE_OPTIONS, CHANNEL_OPTIONS } from '../shared/constants';
+import { CHANNEL_OPTIONS } from '../shared/constants';
 import { PreviewData } from '../shared/types';
+import { useContext } from 'react';
+import SettingsContext from '../../../contexts/SettingsContext';
 
 interface FlowConfigPreviewProps {
   visible: boolean;
@@ -36,6 +38,11 @@ export function FlowConfigPreview({
   onRefresh,
   refreshLoading,
 }: FlowConfigPreviewProps) {
+  const locales = useContext(SettingsContext)?.locales || [];
+  const localeOptions = locales.map((locale) => ({
+    label: locale.name,
+    value: locale.code,
+  }));
   return (
     <Modal
       onDismiss={onDismiss}
@@ -66,18 +73,22 @@ export function FlowConfigPreview({
           <ColumnLayout columns={2}>
             <FormField label="Language">
               <Select
-                selectedOption={LANGUAGE_OPTIONS.find(opt => opt.value === lang) || null}
+                selectedOption={
+                  localeOptions.find((opt) => opt.value === lang) || null
+                }
                 onChange={({ detail }) => {
                   if (detail.selectedOption?.value) {
                     onLangChange(detail.selectedOption.value);
                   }
                 }}
-                options={LANGUAGE_OPTIONS}
+                options={localeOptions}
               />
             </FormField>
             <FormField label="Channel">
               <Select
-                selectedOption={CHANNEL_OPTIONS.find(opt => opt.value === channel) || null}
+                selectedOption={
+                  CHANNEL_OPTIONS.find((opt) => opt.value === channel) || null
+                }
                 onChange={({ detail }) => {
                   if (detail.selectedOption?.value) {
                     onChannelChange(detail.selectedOption.value);
@@ -91,9 +102,9 @@ export function FlowConfigPreview({
 
         {/* Preview Results */}
         {previewData && (
-          <Container 
+          <Container
             header={
-              <Header 
+              <Header
                 variant="h3"
                 description="These are the exact key-value pairs that will be returned when Amazon Connect contact flows call the GetConfig Lambda function with the selected language and channel."
               >
@@ -121,11 +132,13 @@ export function FlowConfigPreview({
                     header: 'Value',
                     cell: (item: { key: string; value: string }) => (
                       <Box>
-                        <div style={{ 
-                          maxWidth: '400px', 
-                          wordWrap: 'break-word',
-                          whiteSpace: 'pre-wrap'
-                        }}>
+                        <div
+                          style={{
+                            maxWidth: '400px',
+                            wordWrap: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                        >
                           {item.value}
                         </div>
                       </Box>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Modal,
   Box,
@@ -10,8 +10,8 @@ import {
   Select,
   Alert,
 } from '@cloudscape-design/components';
-import { LANGUAGE_OPTIONS } from '../shared/constants';
 import { PromptData } from '../shared/types';
+import SettingsContext from '../../../contexts/SettingsContext';
 
 interface AddPromptModalProps {
   visible: boolean;
@@ -20,9 +20,23 @@ interface AddPromptModalProps {
   existingPrompts: string[];
 }
 
-export function AddPromptModal({ visible, onDismiss, onAdd, existingPrompts }: AddPromptModalProps) {
+export function AddPromptModal({
+  visible,
+  onDismiss,
+  onAdd,
+  existingPrompts,
+}: AddPromptModalProps) {
+  const locales = useContext(SettingsContext)?.locales || [];
+  const localeOptions = locales.map((locale) => ({
+    label: locale.name,
+    value: locale.code,
+  }));
+
   const [name, setName] = useState('');
-  const [language, setLanguage] = useState({ label: 'English (US)', value: 'en-US' });
+  const [language, setLanguage] = useState({
+    label: 'English (US)',
+    value: 'en-US',
+  });
   const [voiceContent, setVoiceContent] = useState('');
   const [chatContent, setChatContent] = useState('');
   const [error, setError] = useState('');
@@ -36,7 +50,7 @@ export function AddPromptModal({ visible, onDismiss, onAdd, existingPrompts }: A
       setError('This prompt name already exists');
       return;
     }
-    
+
     const promptData: PromptData = {
       name,
       languages: {
@@ -46,7 +60,7 @@ export function AddPromptModal({ visible, onDismiss, onAdd, existingPrompts }: A
         },
       },
     };
-    
+
     onAdd(promptData);
     setName('');
     setLanguage({ label: 'English (US)', value: 'en-US' });
@@ -96,11 +110,17 @@ export function AddPromptModal({ visible, onDismiss, onAdd, existingPrompts }: A
           <Select
             selectedOption={language}
             onChange={({ detail }) => {
-              if (detail.selectedOption && detail.selectedOption.label && detail.selectedOption.value) {
-                setLanguage(detail.selectedOption as { label: string; value: string });
+              if (
+                detail.selectedOption &&
+                detail.selectedOption.label &&
+                detail.selectedOption.value
+              ) {
+                setLanguage(
+                  detail.selectedOption as { label: string; value: string }
+                );
               }
             }}
-            options={LANGUAGE_OPTIONS}
+            options={localeOptions}
           />
         </FormField>
         <FormField label="Voice Content" stretch>

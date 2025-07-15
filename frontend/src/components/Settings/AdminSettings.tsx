@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Header,
@@ -7,33 +7,48 @@ import {
   Button,
   Box,
   Alert,
+  Spinner,
 } from '@cloudscape-design/components';
 import { usePermissions } from '../../hooks/usePermissions';
-import { Locale } from '../../shared';
+import { useApi } from '../../hooks/useApi';
+import { Locale, Settings } from '../../shared';
 import AddLocaleModal from './AddLocaleModal';
 import AddVoiceModal from './AddVoiceModal';
 
-export default function Settings() {
+export default function AdminSettings() {
   const { isAdmin } = usePermissions();
-  const [locales, setLocales] = useState<Locale[]>([
-    {
-      code: 'en-US',
-      name: 'English (US)',
-      voices: ['Joanna', 'Matthew'],
-    },
-    {
-      code: 'es-US',
-      name: 'Spanish (US)',
-      voices: ['Lupe', 'Pedro'],
-    },
-  ]);
+  const { apiFetch } = useApi();
+  const [locales, setLocales] = useState<Locale[]>([]);
   const [showAddLocaleModal, setShowAddLocaleModal] = useState(false);
   const [showAddVoiceModal, setShowAddVoiceModal] = useState(false);
   const [editingLocale, setEditingLocale] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Mock function to handle adding a locale
+  // Load settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await apiFetch<Settings>('GET', '/api/settings');
+        if (settings) {
+          setLocales(settings.locales);
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAdmin()) {
+      loadSettings();
+    } else {
+      setLoading(false);
+    }
+  }, [apiFetch, isAdmin]);
+
+  // Function to handle adding a locale
   const handleAddLocale = (localeData: { code: string; name: string }) => {
     const newLocale: Locale = {
       ...localeData,
@@ -44,7 +59,7 @@ export default function Settings() {
     setHasUnsavedChanges(true);
   };
 
-  // Mock function to handle adding a voice to a locale
+  // Function to handle adding a voice to a locale
   const handleAddVoice = (voiceId: string) => {
     if (!editingLocale) return;
 
@@ -60,7 +75,7 @@ export default function Settings() {
     setHasUnsavedChanges(true);
   };
 
-  // Mock function to handle removing a voice
+  // Function to handle removing a voice
   const handleRemoveVoice = (localeCode: string, voiceId: string) => {
     setLocales(
       locales.map((locale) =>
@@ -72,22 +87,18 @@ export default function Settings() {
     setHasUnsavedChanges(true);
   };
 
-  // Mock function to handle deleting a locale
+  // Function to handle deleting a locale
   const handleDeleteLocale = (localeCode: string) => {
     setLocales(locales.filter((locale) => locale.code !== localeCode));
     setHasUnsavedChanges(true);
   };
 
-  // Mock function to handle saving settings
+  // Function to handle saving settings
   const handleSave = async () => {
     setSaving(true);
     try {
-      // TODO: Implement API call to save settings
-      console.log('Saving locales:', locales);
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      const settings: Settings = { locales };
+      await apiFetch<Settings>('POST', '/api/settings', settings);
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -102,6 +113,19 @@ export default function Settings() {
         <Alert type="error">
           Access denied. Only administrators can access settings.
         </Alert>
+      </Container>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Container>
+        <Box textAlign="center">
+          <Spinner size="large" />
+          <Box variant="p" color="inherit">
+            Loading settings...
+          </Box>
+        </Box>
       </Container>
     );
   }
