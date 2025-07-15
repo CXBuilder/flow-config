@@ -41,12 +41,8 @@ export default function AdminSettings() {
       }
     };
 
-    if (isAdmin()) {
-      loadSettings();
-    } else {
-      setLoading(false);
-    }
-  }, [apiFetch, isAdmin]);
+    loadSettings();
+  }, []);
 
   // Function to handle adding a locale
   const handleAddLocale = (localeData: { code: string; name: string }) => {

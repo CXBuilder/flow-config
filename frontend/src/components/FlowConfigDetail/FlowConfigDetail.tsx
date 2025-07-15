@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { SpaceBetween, Alert } from '@cloudscape-design/components';
 import { useApi } from '../../hooks/useApi';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -12,12 +12,15 @@ import {
   AddLocaleModal,
 } from './FlowConfigModals';
 import { FlowConfig } from '../../shared';
+import SettingsContext from '../../contexts/SettingsContext';
 
 export default function FlowConfigDetail({
   flowConfigId,
   onClose,
   onSave,
 }: FlowConfigDetailProps) {
+  const locales = useContext(SettingsContext)?.locales || [];
+
   const [flowConfig, setFlowConfig] = useState<FlowConfig>({
     id: '',
     description: '',
@@ -27,7 +30,10 @@ export default function FlowConfigDetail({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>('');
   const [selectedVoices, setSelectedVoices] = useState<Record<string, string>>(
-    {}
+    locales.reduce((acc, locale) => {
+      acc[locale.code] = locale.voices[0] || '';
+      return acc;
+    }, {} as Record<string, string>)
   );
   const [showAddPromptModal, setShowAddPromptModal] = useState(false);
   const [showAddVariableModal, setShowAddVariableModal] = useState(false);
