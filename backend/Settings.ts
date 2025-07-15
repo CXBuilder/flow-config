@@ -168,6 +168,35 @@ async function handlePostSettings(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   try {
+    // Extract user claims from Cognito authorizer
+    const claims = event.requestContext.authorizer?.claims;
+
+    // If Cognito is not enabled (no userPoolId), assume admin access
+    const cognitoEnabled = !!env.USER_POOL_ID;
+
+    if (cognitoEnabled && !claims) {
+      return respondObject(401, new Error('Unauthorized'));
+    }
+
+    // Create mock admin claims when Cognito is disabled
+    const effectiveClaims = cognitoEnabled
+      ? claims
+      : { 'cognito:groups': 'FlowConfigAdmin' };
+
+    const accessLevel = getAccessLevel(effectiveClaims);
+
+    // Check if user has admin access
+    if (accessLevel !== 'Full') {
+      logger.warn('Access denied - admin access required', {
+        userId: claims.sub,
+        accessLevel,
+      });
+      return respondObject(403, {
+        code: 'FORBIDDEN',
+        message: 'Admin access required',
+      });
+    }
+
     // Parse request body
     if (!event.body) {
       return respondObject(400, {
@@ -222,22 +251,6 @@ export const handler = async (
   });
 
   try {
-    // Get user claims and check access level
-    const claims = event.requestContext.authorizer?.claims || {};
-    const accessLevel = getAccessLevel(claims);
-
-    // Check if user has admin access
-    if (accessLevel !== 'Full') {
-      logger.warn('Access denied - admin access required', {
-        userId: claims.sub,
-        accessLevel,
-      });
-      return respondObject(403, {
-        code: 'FORBIDDEN',
-        message: 'Admin access required',
-      });
-    }
-
     // Route based on HTTP method
     switch (event.httpMethod) {
       case 'GET':

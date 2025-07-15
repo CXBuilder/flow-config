@@ -14,7 +14,6 @@ import { ITopic } from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
-import { FlowConfigStack } from './FlowConfigStack';
 
 interface CreateLambdaProps<TEnv>
   extends Omit<FunctionProps, 'handler' | 'environment' | 'code' | 'runtime'> {

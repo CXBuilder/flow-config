@@ -14,6 +14,7 @@ export class Settings extends Construct {
     this.lambda = createLambda<SettingsEnv>(this, 'Handler', {
       environment: {
         TABLE_NAME: api.stack.table.tableName,
+        USER_POOL_ID: api.stack.props.cognito?.userPoolId || '',
       },
       alertTopic: api.stack.alertTopic,
     });
