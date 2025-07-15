@@ -18,7 +18,7 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 describe('Settings Handler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.SETTINGS_TABLE_NAME = 'test-settings-table';
+    process.env.TABLE_NAME = 'test-settings-table';
   });
 
   const mockAdminEvent: Partial<APIGatewayProxyEvent> = {
@@ -242,9 +242,7 @@ describe('Settings Handler', () => {
 
     it('should reject invalid language codes', async () => {
       const invalidSettings = {
-        locales: [
-          { code: 'invalid', name: 'Invalid', voices: ['Joanna'] },
-        ],
+        locales: [{ code: 'invalid', name: 'Invalid', voices: ['Joanna'] }],
       };
 
       const event: APIGatewayProxyEvent = {

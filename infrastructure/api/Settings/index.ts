@@ -1,47 +1,24 @@
 import { Construct } from 'constructs';
 import { createLambda } from '../../createLambda';
 import { Function } from 'aws-cdk-lib/aws-lambda';
-import { FlowConfigStack } from '../../FlowConfigStack';
 import { SettingsEnv } from './Settings.interface';
-import { Table } from 'aws-cdk-lib/aws-dynamodb';
-import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import { Api } from '../Api';
 
 export class Settings extends Construct {
-  readonly function: Function;
-  readonly table: Table;
+  readonly lambda: Function;
 
-  constructor(stack: FlowConfigStack) {
-    super(stack, 'Settings');
-
-    const { prefix } = stack.props;
-
-    // Create DynamoDB table for settings
-    this.table = new Table(this, 'SettingsTable', {
-      tableName: `${prefix}-settings`,
-      partitionKey: {
-        name: 'id',
-        type: dynamodb.AttributeType.STRING,
-      },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      pointInTimeRecoverySpecification: {
-        pointInTimeRecoveryEnabled: true,
-      },
-      deletionProtection: stack.props.prod || false,
-      removalPolicy: stack.props.prod 
-        ? dynamodb.RemovalPolicy.RETAIN 
-        : dynamodb.RemovalPolicy.DESTROY,
-    });
+  constructor(api: Api) {
+    super(api, 'Settings');
 
     // Create Lambda function
-    this.function = createLambda<SettingsEnv>(this, 'Handler', {
-      functionName: `${prefix}-settings`,
+    this.lambda = createLambda<SettingsEnv>(this, 'Handler', {
       environment: {
-        SETTINGS_TABLE_NAME: this.table.tableName,
+        TABLE_NAME: api.stack.table.tableName,
       },
-      alertTopic: stack.alertTopic,
+      alertTopic: api.stack.alertTopic,
     });
 
     // Grant DynamoDB permissions
-    this.table.grantReadWriteData(this.function);
+    api.stack.table.grantReadWriteData(this.lambda);
   }
 }

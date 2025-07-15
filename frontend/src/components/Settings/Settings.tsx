@@ -9,15 +9,9 @@ import {
   Alert,
 } from '@cloudscape-design/components';
 import { usePermissions } from '../../hooks/usePermissions';
+import { Locale } from '../../shared';
 import AddLocaleModal from './AddLocaleModal';
 import AddVoiceModal from './AddVoiceModal';
-
-// Mock data structure - will be replaced with API calls
-interface Locale {
-  code: string;
-  name: string;
-  voices: string[]; // Just store voice IDs
-}
 
 export default function Settings() {
   const { isAdmin } = usePermissions();

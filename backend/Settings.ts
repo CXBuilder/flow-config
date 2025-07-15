@@ -9,13 +9,12 @@ import { logger } from './shared/logger';
 import { respondObject } from './shared/respond';
 import { getAccessLevel } from './shared/permissions';
 import { Settings } from './shared/models';
+import { SettingsEnv } from '../infrastructure/api/Settings/Settings.interface';
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(client);
 
-// Settings table name - will be set via environment variable
-const SETTINGS_TABLE_NAME =
-  process.env.SETTINGS_TABLE_NAME || 'FlowConfigSettings';
+const env = process.env as unknown as SettingsEnv;
 
 // Settings item ID - we use a single item to store all settings
 const SETTINGS_ITEM_ID = 'application-settings';
@@ -93,7 +92,7 @@ function validateSettings(settings: any): settings is Settings {
 async function getSettings(): Promise<Settings> {
   try {
     const command = new GetCommand({
-      TableName: SETTINGS_TABLE_NAME,
+      TableName: env.TABLE_NAME,
       Key: { id: SETTINGS_ITEM_ID },
     });
 
@@ -128,7 +127,7 @@ async function saveSettings(
     };
 
     const command = new PutCommand({
-      TableName: SETTINGS_TABLE_NAME,
+      TableName: env.TABLE_NAME,
       Item: item,
     });
 
