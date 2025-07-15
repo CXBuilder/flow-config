@@ -23,12 +23,12 @@ export function VariablesSection({
   canAddVariables = true,
   isReadOnly = false,
 }: VariablesSectionProps) {
-  const variableItems = Object.entries(flowConfig.variables).map(
-    ([key, value]) => ({
+  const variableItems = Object.entries(flowConfig.variables)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => ({
       key,
       value,
-    })
-  );
+    }));
 
   const handleUpdateVariableValue = (key: string, newValue: string) => {
     onUpdate({

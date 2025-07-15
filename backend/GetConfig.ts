@@ -16,9 +16,7 @@ interface GetConfigEvent {
     };
     ContactData: {
       Channel: string;
-      Attributes: {
-        lang?: string;
-      };
+      LanguageCode: string;
     };
   };
 
@@ -38,7 +36,7 @@ export const handler = async (
     const configId = event?.Details?.Parameters?.id ?? event.id;
     const language =
       event?.Details?.Parameters?.lang ??
-      event?.Details?.ContactData?.Attributes?.lang ??
+      event?.Details?.ContactData?.LanguageCode ??
       event.lang ??
       'en-US';
     const channel = (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Modal,
   Box,
@@ -9,30 +9,47 @@ import {
   Select,
   Alert,
 } from '@cloudscape-design/components';
-import { LANGUAGE_OPTIONS } from '../shared/constants';
+import SettingsContext from '../../../contexts/SettingsContext';
 
-interface AddLanguageModalProps {
+interface AddLocaleModalProps {
   visible: boolean;
   promptName: string;
   onDismiss: () => void;
-  onAdd: (promptName: string, language: string, voiceContent: string, chatContent?: string) => void;
-  existingLanguages: string[];
+  onAdd: (
+    promptName: string,
+    locale: string,
+    voiceContent: string,
+    chatContent?: string
+  ) => void;
+  existingLocales: string[];
 }
 
-export function AddLanguageModal({ visible, promptName, onDismiss, onAdd, existingLanguages }: AddLanguageModalProps) {
+export function AddLocaleModal({
+  visible,
+  promptName,
+  onDismiss,
+  onAdd,
+  existingLocales,
+}: AddLocaleModalProps) {
   const [voiceContent, setVoiceContent] = useState('');
   const [chatContent, setChatContent] = useState('');
   const [error, setError] = useState('');
 
-  // Filter out languages that are already used for this prompt
-  const availableLanguageOptions = LANGUAGE_OPTIONS.filter(
-    option => !existingLanguages.includes(option.value)
+  const locales = useContext(SettingsContext)?.locales || [];
+  const localeOptions = locales.map((locale) => ({
+    label: locale.name,
+    value: locale.code,
+  }));
+
+  // Filter out locales that are already used for this prompt
+  const availableLocaleOptions = localeOptions.filter(
+    (option) => !existingLocales.includes(option.value)
   );
 
-  // Set default to first available language
-  const [language, setLanguage] = useState(
-    availableLanguageOptions.length > 0 
-      ? availableLanguageOptions[0] 
+  // Set default to first available locale
+  const [locale, setLocale] = useState(
+    availableLocaleOptions.length > 0
+      ? availableLocaleOptions[0]
       : { label: '', value: '' }
   );
 
@@ -41,13 +58,17 @@ export function AddLanguageModal({ visible, promptName, onDismiss, onAdd, existi
       setError('Voice content is required');
       return;
     }
-    if (!language.value) {
-      setError('Please select a language');
+    if (!locale.value) {
+      setError('Please select a locale');
       return;
     }
-    
-    onAdd(promptName, language.value, voiceContent, chatContent);
-    setLanguage(availableLanguageOptions.length > 0 ? availableLanguageOptions[0] : { label: '', value: '' });
+
+    onAdd(promptName, locale.value, voiceContent, chatContent);
+    setLocale(
+      availableLocaleOptions.length > 0
+        ? availableLocaleOptions[0]
+        : { label: '', value: '' }
+    );
     setVoiceContent('');
     setChatContent('');
     setError('');
@@ -55,7 +76,11 @@ export function AddLanguageModal({ visible, promptName, onDismiss, onAdd, existi
   };
 
   const handleDismiss = () => {
-    setLanguage(availableLanguageOptions.length > 0 ? availableLanguageOptions[0] : { label: '', value: '' });
+    setLocale(
+      availableLocaleOptions.length > 0
+        ? availableLocaleOptions[0]
+        : { label: '', value: '' }
+    );
     setVoiceContent('');
     setChatContent('');
     setError('');
@@ -66,19 +91,19 @@ export function AddLanguageModal({ visible, promptName, onDismiss, onAdd, existi
     <Modal
       onDismiss={handleDismiss}
       visible={visible}
-      header={`Add Language to "${promptName}"`}
+      header={`Add Locale to "${promptName}"`}
       footer={
         <Box float="right">
           <SpaceBetween direction="horizontal" size="xs">
             <Button variant="link" onClick={handleDismiss}>
               Cancel
             </Button>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={handleAdd}
-              disabled={availableLanguageOptions.length === 0}
+              disabled={availableLocaleOptions.length === 0}
             >
-              Add Language
+              Add Locale
             </Button>
           </SpaceBetween>
         </Box>
@@ -86,21 +111,27 @@ export function AddLanguageModal({ visible, promptName, onDismiss, onAdd, existi
     >
       <SpaceBetween direction="vertical" size="m">
         {error && <Alert type="error">{error}</Alert>}
-        {availableLanguageOptions.length === 0 ? (
+        {availableLocaleOptions.length === 0 ? (
           <Alert type="warning">
-            All available languages have already been added to this prompt.
+            All available locales have already been added to this prompt.
           </Alert>
         ) : (
           <>
-            <FormField label="Language">
+            <FormField label="Locale">
               <Select
-                selectedOption={language}
+                selectedOption={locale}
                 onChange={({ detail }) => {
-                  if (detail.selectedOption && detail.selectedOption.label && detail.selectedOption.value) {
-                    setLanguage(detail.selectedOption as { label: string; value: string });
+                  if (
+                    detail.selectedOption &&
+                    detail.selectedOption.label &&
+                    detail.selectedOption.value
+                  ) {
+                    setLocale(
+                      detail.selectedOption as { label: string; value: string }
+                    );
                   }
                 }}
-                options={availableLanguageOptions}
+                options={availableLocaleOptions}
               />
             </FormField>
             <FormField label="Voice Content" stretch>

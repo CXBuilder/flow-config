@@ -144,6 +144,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get application settings
+         * @description Returns the current application settings including configured locales and voices
+         */
+        get: operations["getSettings"];
+        put?: never;
+        /**
+         * Update application settings
+         * @description Updates the application settings including configured locales and voices. Admin access required.
+         */
+        post: operations["updateSettings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/preview-speech": {
         parameters: {
             query?: never;
@@ -362,6 +386,26 @@ export interface components {
              * @enum {string}
              */
             channel: "voice" | "chat";
+        };
+        /** @description Locale configuration with available voices */
+        Locale: {
+            /**
+             * @description Amazon Polly language code (e.g., en-US, arb, cmn-CN)
+             * @example en-US
+             */
+            code: string;
+            /**
+             * @description Human-readable display name for the locale
+             * @example English (United States)
+             */
+            name: string;
+            /** @description Array of Amazon Polly voice IDs available for this locale */
+            voices: string[];
+        };
+        /** @description Application settings including locale and voice configurations */
+        Settings: {
+            /** @description Array of configured locales with their available voices */
+            locales: components["schemas"]["Locale"][];
         };
     };
     responses: never;
@@ -636,6 +680,105 @@ export interface operations {
             };
             /** @description Flow config or prompt not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settings"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden - Admin access required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Settings object */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Settings"];
+            };
+        };
+        responses: {
+            /** @description Settings updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settings"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden - Admin access required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Payload too large */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };

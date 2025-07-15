@@ -212,4 +212,103 @@ describe('GetConfig Handler', () => {
 
     expect(result).toEqual(mockFlowConfig.variables);
   });
+
+  describe('Connect event structure and language precedence', () => {
+    it('should use LanguageCode from Connect event', async () => {
+      mockSend.mockResolvedValue({
+        Item: mockFlowConfig,
+      });
+
+      const connectEvent = {
+        Details: {
+          Parameters: {
+            id: 'test-config',
+          },
+          ContactData: {
+            Channel: 'VOICE',
+            LanguageCode: 'es-US',
+          },
+        },
+      };
+
+      const result = await handler(connectEvent);
+
+      expect(result.welcome).toBe(
+        'Bienvenido a nuestro servicio. ¿Cómo puedo ayudarte hoy?'
+      );
+    });
+
+    it('should prioritize Parameters.lang over LanguageCode', async () => {
+      mockSend.mockResolvedValue({
+        Item: mockFlowConfig,
+      });
+
+      const connectEvent = {
+        Details: {
+          Parameters: {
+            id: 'test-config',
+            lang: 'en-US', // Should take precedence
+          },
+          ContactData: {
+            Channel: 'VOICE',
+            LanguageCode: 'es-US', // Should be ignored
+          },
+        },
+      };
+
+      const result = await handler(connectEvent);
+
+      expect(result.welcome).toBe(
+        'Welcome to our service. How can I help you today?'
+      );
+    });
+
+    it('should handle full Connect event structure', async () => {
+      mockSend.mockResolvedValue({
+        Item: mockFlowConfig,
+      });
+
+      const connectEvent = {
+        Details: {
+          Parameters: {
+            id: 'test-config',
+          },
+          ContactData: {
+            Channel: 'CHAT',
+            LanguageCode: 'en-US',
+          },
+        },
+      };
+
+      const result = await handler(connectEvent);
+
+      expect(result.welcome).toBe(
+        'Hi! Welcome to our service. How can I assist you?'
+      );
+    });
+
+    it('should fall back to default language when LanguageCode is not available', async () => {
+      mockSend.mockResolvedValue({
+        Item: mockFlowConfig,
+      });
+
+      const connectEvent = {
+        Details: {
+          Parameters: {
+            id: 'test-config',
+          },
+          ContactData: {
+            Channel: 'VOICE',
+            // No LanguageCode provided
+          },
+        },
+      };
+
+      const result = await handler(connectEvent);
+
+      expect(result.welcome).toBe(
+        'Welcome to our service. How can I help you today?'
+      );
+    });
+  });
 });

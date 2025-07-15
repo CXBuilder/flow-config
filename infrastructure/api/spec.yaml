@@ -187,6 +187,45 @@ components:
           type: string
           description: Channel type for the prompt
           enum: [voice, chat]
+    Locale:
+      type: object
+      description: Locale configuration with available voices
+      required:
+        - code
+        - name
+        - voices
+      properties:
+        code:
+          type: string
+          description: Amazon Polly language code (e.g., en-US, arb, cmn-CN)
+          pattern: '^([a-z]{2,3}(-[A-Z]{2})?(-[A-Z]{3})?|arb)$'
+          example: en-US
+        name:
+          type: string
+          description: Human-readable display name for the locale
+          example: English (United States)
+          maxLength: 100
+        voices:
+          type: array
+          description: Array of Amazon Polly voice IDs available for this locale
+          items:
+            type: string
+            description: Amazon Polly voice ID
+            example: Joanna
+            maxLength: 50
+          maxItems: 50
+    Settings:
+      type: object
+      description: Application settings including locale and voice configurations
+      required:
+        - locales
+      properties:
+        locales:
+          type: array
+          description: Array of configured locales with their available voices
+          items:
+            $ref: '#/components/schemas/Locale'
+          maxItems: 100
 paths:
   /api/init:
     get:
@@ -450,6 +489,86 @@ paths:
                 $ref: '#/components/schemas/Error'
         '404':
           description: Flow config or prompt not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/settings:
+    get:
+      summary: Get application settings
+      description: Returns the current application settings including configured locales and voices
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: SettingsHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: getSettings
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Update application settings
+      description: Updates the application settings including configured locales and voices. Admin access required.
+      x-amazon-apigateway-integration:
+        httpMethod: 'POST'
+        uri: SettingsHandler
+        passthroughBehavior: 'when_no_match'
+        type: 'aws_proxy'
+      security:
+        - CognitoAuthorizer: []
+      operationId: updateSettings
+      requestBody:
+        description: Settings object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Payload too large
           content:
             application/json:
               schema:

@@ -5,6 +5,7 @@ import {
   Pagination,
   TextFilter,
   Button,
+  ButtonDropdown,
   SpaceBetween,
   Box,
   Modal,
@@ -16,7 +17,9 @@ import FlowConfigDetail from './FlowConfigDetail';
 import {
   FlowConfigSummary,
   FlowConfigList as FlowConfigListType,
+  FlowConfig,
 } from '../shared';
+import SettingsProvider from '../contexts/SettingsProvider';
 
 export default function FlowConfigList() {
   const [flowConfigs, setFlowConfigs] = useState<FlowConfigSummary[]>([]);
@@ -34,6 +37,9 @@ export default function FlowConfigList() {
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importData, setImportData] = useState<FlowConfig[]>([]);
+  const [importing, setImporting] = useState(false);
 
   const { apiFetch } = useApi();
   const { hasAccess, isAdmin } = usePermissions();
@@ -103,6 +109,213 @@ export default function FlowConfigList() {
     await loadFlowConfigs();
   };
 
+  const handleExport = async () => {
+    if (selectedItems.length === 0) {
+      setAlert({
+        type: 'error',
+        message: 'Please select at least one flow configuration to export.',
+      });
+      return;
+    }
+
+    try {
+      // Fetch full details for each selected flow config
+      const exportPromises = selectedItems.map(async (item) => {
+        const result = await apiFetch<FlowConfig>(
+          'GET',
+          `/api/flow-config/${item.id}`
+        );
+        return result;
+      });
+
+      const fullFlowConfigs = await Promise.all(exportPromises);
+
+      // Filter out any failed requests
+      const validConfigs = fullFlowConfigs.filter(
+        (config) => config !== null && config !== undefined
+      );
+
+      if (validConfigs.length === 0) {
+        setAlert({
+          type: 'error',
+          message: 'Failed to fetch flow configuration details for export.',
+        });
+        return;
+      }
+
+      // Create filename with timestamp and count
+      const now = new Date();
+      const timestamp = now
+        .toISOString()
+        .slice(0, 16)
+        .replace('T', '-')
+        .replace(':', '');
+      const filename = `flow-configs-${validConfigs.length}-items-${timestamp}.json`;
+
+      // Create and download file as simple array
+      const blob = new Blob([JSON.stringify(validConfigs, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setAlert({
+        type: 'success',
+        message: `Successfully exported ${validConfigs.length} flow configuration(s) to ${filename}`,
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      setAlert({
+        type: 'error',
+        message:
+          'Failed to export selected flow configurations. Please try again.',
+      });
+    }
+  };
+
+  const handleImport = () => {
+    // Create file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.style.display = 'none';
+
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const parsedData = JSON.parse(text);
+
+        // Validate import data structure - expect simple array or legacy format
+        let flowConfigs: any[];
+
+        if (Array.isArray(parsedData)) {
+          // New format: simple array
+          flowConfigs = parsedData;
+        } else if (
+          parsedData.flowConfigs &&
+          Array.isArray(parsedData.flowConfigs)
+        ) {
+          // Legacy format: wrapped in metadata object
+          flowConfigs = parsedData.flowConfigs;
+        } else {
+          throw new Error(
+            'Invalid import file format. Expected a JSON array of flow configurations.'
+          );
+        }
+
+        if (flowConfigs.length === 0) {
+          throw new Error('Import file contains no flow configurations.');
+        }
+
+        // Additional validation for FlowConfig structure
+        const hasValidStructure = flowConfigs.every(
+          (config: any) =>
+            config.id &&
+            config.description !== undefined &&
+            config.variables !== undefined &&
+            config.prompts !== undefined
+        );
+
+        if (!hasValidStructure) {
+          throw new Error(
+            'Invalid flow configuration structure in import file.'
+          );
+        }
+
+        // Store validated data and show confirmation modal
+        setImportData(flowConfigs as FlowConfig[]);
+        setShowImportModal(true);
+      } catch (error) {
+        console.error('Import error:', error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Failed to process import file';
+        setAlert({
+          type: 'error',
+          message: `Import failed: ${errorMessage}`,
+        });
+      }
+    };
+
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+  };
+
+  const handleConfirmImport = async () => {
+    setImporting(true);
+    let successCount = 0;
+    let errorCount = 0;
+    const errors: string[] = [];
+
+    try {
+      for (const config of importData) {
+        try {
+          await apiFetch<FlowConfig>(
+            'POST',
+            `/api/flow-config/${config.id}`,
+            config
+          );
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          errors.push(
+            `Failed to import "${config.id}": ${
+              error instanceof Error ? error.message : 'Unknown error'
+            }`
+          );
+          console.error(`Import error for ${config.id}:`, error);
+        }
+      }
+
+      // Show results
+      if (successCount > 0 && errorCount === 0) {
+        setAlert({
+          type: 'success',
+          message: `Successfully imported ${successCount} flow configuration(s).`,
+        });
+      } else if (successCount > 0 && errorCount > 0) {
+        setAlert({
+          type: 'error',
+          message: `Imported ${successCount} flow configuration(s) successfully, but ${errorCount} failed. Check console for details.`,
+        });
+      } else {
+        setAlert({
+          type: 'error',
+          message: `Import failed: ${errorCount} flow configuration(s) could not be imported. Check console for details.`,
+        });
+      }
+
+      // Log detailed errors for debugging
+      if (errors.length > 0) {
+        console.error('Import errors:', errors);
+      }
+
+      // Refresh the list to show imported items
+      await loadFlowConfigs();
+    } catch (error) {
+      setAlert({
+        type: 'error',
+        message: 'Import process failed. Please try again.',
+      });
+      console.error('Import process error:', error);
+    } finally {
+      setImporting(false);
+      setShowImportModal(false);
+      setImportData([]);
+    }
+  };
+
   useEffect(() => {
     loadFlowConfigs();
   }, []);
@@ -114,11 +327,14 @@ export default function FlowConfigList() {
       item.description?.toLowerCase().includes(filteringText.toLowerCase())
   );
 
+  // Sort items alphabetically by ID
+  const sortedItems = filteredItems.sort((a, b) => a.id!.localeCompare(b.id!));
+
   // Pagination
   const pageSize = 10;
   const startIndex = (currentPageIndex - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const paginatedItems = filteredItems.slice(startIndex, endIndex);
+  const paginatedItems = sortedItems.slice(startIndex, endIndex);
 
   const columnDefinitions = [
     {
@@ -153,7 +369,7 @@ export default function FlowConfigList() {
   ];
 
   return (
-    <>
+    <SettingsProvider>
       <Table
         columnDefinitions={columnDefinitions}
         items={paginatedItems}
@@ -179,15 +395,12 @@ export default function FlowConfigList() {
         }}
         header={
           <Header
-            counter={`(${filteredItems.length})`}
+            counter={`(${sortedItems.length})`}
             actions={
               <SpaceBetween direction="horizontal" size="xs">
                 {isAdmin() && (
-                  <Button
-                    disabled={selectedItems.length === 0}
-                    onClick={() => setShowDeleteModal(true)}
-                  >
-                    Delete
+                  <Button variant="primary" onClick={handleCreate}>
+                    Create
                   </Button>
                 )}
                 {hasAccess('Edit') && (
@@ -199,9 +412,39 @@ export default function FlowConfigList() {
                   </Button>
                 )}
                 {isAdmin() && (
-                  <Button variant="primary" onClick={handleCreate}>
-                    Create
+                  <Button
+                    disabled={selectedItems.length === 0}
+                    onClick={() => setShowDeleteModal(true)}
+                  >
+                    Delete
                   </Button>
+                )}
+                {isAdmin() && (
+                  <ButtonDropdown
+                    items={[
+                      {
+                        text: 'Export Selected',
+                        id: 'export',
+                        iconName: 'download',
+                        disabled: selectedItems.length === 0,
+                      },
+                      {
+                        text: 'Import',
+                        id: 'import',
+                        iconName: 'upload',
+                      },
+                    ]}
+                    variant="normal"
+                    onItemClick={({ detail }) => {
+                      if (detail.id === 'export') {
+                        handleExport();
+                      } else if (detail.id === 'import') {
+                        handleImport();
+                      }
+                    }}
+                  >
+                    More Actions
+                  </ButtonDropdown>
                 )}
               </SpaceBetween>
             }
@@ -239,7 +482,9 @@ export default function FlowConfigList() {
             <SpaceBetween size="m">
               <b>No flow configurations</b>
               {isAdmin() && (
-                <Button onClick={handleCreate}>Create flow configuration</Button>
+                <Button onClick={handleCreate}>
+                  Create flow configuration
+                </Button>
               )}
             </SpaceBetween>
           </Box>
@@ -314,6 +559,52 @@ export default function FlowConfigList() {
           )}
         </SpaceBetween>
       </Modal>
-    </>
+
+      {/* Import Confirmation Modal */}
+      <Modal
+        visible={showImportModal}
+        onDismiss={() => setShowImportModal(false)}
+        header="Import Flow Configurations"
+        footer={
+          <Box float="right">
+            <SpaceBetween direction="horizontal" size="xs">
+              <Button variant="link" onClick={() => setShowImportModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                loading={importing}
+                onClick={handleConfirmImport}
+              >
+                Import
+              </Button>
+            </SpaceBetween>
+          </Box>
+        }
+      >
+        <SpaceBetween direction="vertical" size="m">
+          <Alert type="warning">
+            <strong>Warning:</strong> Importing will overwrite any existing flow
+            configurations with the same IDs.
+          </Alert>
+          <Box variant="span">
+            Are you sure you want to import {importData.length} flow
+            configuration{importData.length > 1 ? 's' : ''}?
+          </Box>
+          {importData.length > 0 && (
+            <Box>
+              <strong>Items to be imported:</strong>
+              <ul>
+                {importData.map((config) => (
+                  <li key={config.id}>
+                    {config.id} - {config.description}
+                  </li>
+                ))}
+              </ul>
+            </Box>
+          )}
+        </SpaceBetween>
+      </Modal>
+    </SettingsProvider>
   );
 }

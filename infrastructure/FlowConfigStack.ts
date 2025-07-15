@@ -96,7 +96,8 @@ export interface ResolvedVpcConfig {
 
 export interface FlowConfigStackProps extends cdk.StackProps {
   /**
-   * Used for resource naming
+   * Used for resource naming. Will also be the name of the Connect Lambda
+   * @example `cxbuilder-flow-config`
    */
   readonly prefix: string;
   readonly cognito?: CognitoConfig;
@@ -149,8 +150,7 @@ export class FlowConfigStack extends cdk.Stack {
   }
 
   get appUrl(): string {
-    const { region } = cdk.Stack.of(this);
-    return `https://${this.api.restApi.restApiId}.execute-api.${region}.amazonaws.com/prod`;
+    return this.api.url;
   }
 
   constructor(

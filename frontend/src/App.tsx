@@ -6,25 +6,31 @@ import {
   SpaceBetween,
   Link,
   TextContent,
+  Tabs,
 } from '@cloudscape-design/components';
 import FlowConfigList from './components/FlowConfigList';
 import { NoPermissions } from './components/NoPermissions';
+import { AdminSettings } from './components/Settings';
 import { usePermissions } from './hooks/usePermissions';
 import { useContext, useState, useEffect } from 'react';
 import { CognitoAuthenticationContext } from './contexts/CognitoAuthenticationProvider';
 
 function App() {
-  const { hasAnyAccess } = usePermissions();
+  const { hasAnyAccess, isAdmin } = usePermissions();
   const tokenProvider = useContext(CognitoAuthenticationContext);
   const [userName, setUserName] = useState<string>();
+  const [activeTab, setActiveTab] = useState('flow-configs');
 
   useEffect(() => {
     if (tokenProvider) {
-      tokenProvider.getIdTokenPayload().then((token) => {
-        setUserName(token['cognito:username'] || token.email);
-      }).catch((error) => {
-        console.error('Failed to get user name:', error);
-      });
+      tokenProvider
+        .getIdTokenPayload()
+        .then((token) => {
+          setUserName(token['cognito:username'] || token.email);
+        })
+        .catch((error) => {
+          console.error('Failed to get user name:', error);
+        });
     } else {
       // Cognito not configured - use a default name for demo
       setUserName('Demo User');
@@ -44,7 +50,26 @@ function App() {
         <Box padding="l">
           <ContentLayout>
             {hasAnyAccess() ? (
-              <FlowConfigList />
+              isAdmin() ? (
+                <Tabs
+                  activeTabId={activeTab}
+                  onChange={({ detail }) => setActiveTab(detail.activeTabId)}
+                  tabs={[
+                    {
+                      label: 'Flow Configurations',
+                      id: 'flow-configs',
+                      content: <FlowConfigList />,
+                    },
+                    {
+                      label: 'Settings',
+                      id: 'settings',
+                      content: <AdminSettings />,
+                    },
+                  ]}
+                />
+              ) : (
+                <FlowConfigList />
+              )
             ) : (
               <NoPermissions userName={userName} />
             )}

@@ -9,8 +9,8 @@ import {
   Box,
 } from '@cloudscape-design/components';
 import { PreviewButton } from '../../PreviewButton';
-import { VOICES_BY_LANGUAGE } from '../shared/constants';
-import { getDefaultVoice } from '../shared/utils';
+import { useContext } from 'react';
+import SettingsContext from '../../../contexts/SettingsContext';
 
 interface PromptLanguageItemProps {
   promptName: string;
@@ -38,8 +38,18 @@ export function PromptLanguageItem({
   onVoiceChange,
   isReadOnly = false,
 }: PromptLanguageItemProps) {
+  const locales = useContext(SettingsContext)?.locales || [];
+
+  const voiceOptions = (code: string) => {
+    const localeSettings = locales.find((l) => l.code === code);
+    return (localeSettings ? localeSettings.voices : []).map((voice) => ({
+      label: voice,
+      value: voice,
+    }));
+  };
+
   const getSelectedVoice = (language: string): string => {
-    return selectedVoices[language] || getDefaultVoice(language);
+    return selectedVoices[language] || '';
   };
 
   return (
@@ -69,10 +79,7 @@ export function PromptLanguageItem({
           <FormField label="Preview Voice">
             <Select
               selectedOption={{
-                label:
-                  VOICES_BY_LANGUAGE[language]?.find(
-                    (v) => v.value === getSelectedVoice(language)
-                  )?.label || 'Joanna (Female)',
+                label: getSelectedVoice(language),
                 value: getSelectedVoice(language),
               }}
               onChange={({ detail }) => {
@@ -80,11 +87,7 @@ export function PromptLanguageItem({
                   onVoiceChange(language, detail.selectedOption.value);
                 }
               }}
-              options={
-                VOICES_BY_LANGUAGE[language] || [
-                  { label: 'Joanna (Female)', value: 'Joanna' },
-                ]
-              }
+              options={voiceOptions(language)}
               placeholder="Select voice"
             />
           </FormField>
