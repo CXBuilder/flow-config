@@ -42,11 +42,13 @@ export default function AddLocaleModal({
     }
 
     // Check for valid Amazon Polly language code format
-    // Supports: 2-letter (da), 3-letter (arb), 2-letter + region (en-US), 3-letter + region (cmn-CN), 
+    // Supports: 2-letter (da), 3-letter (arb), 2-letter + region (en-US), 3-letter + region (cmn-CN),
     // and special cases like en-GB-WLS
     const localePattern = /^([a-z]{2,3}(-[A-Z]{2})?(-[A-Z]{3})?|arb)$/;
     if (!localePattern.test(localeCode)) {
-      setError('Invalid language code format. Must be a valid Amazon Polly language code (e.g., "en-US", "arb", "cmn-CN")');
+      setError(
+        'Invalid language code format. Must be a valid Amazon Polly language code (e.g., "en-US", "arb", "cmn-CN")'
+      );
       return;
     }
 
@@ -86,18 +88,17 @@ export default function AddLocaleModal({
       }
     >
       <SpaceBetween direction="vertical" size="m">
-        {error && (
-          <Alert statusIconAriaLabel="Error" type="error">
-            {error}
-          </Alert>
-        )}
+        {error && <Alert type="error">{error}</Alert>}
 
         <FormField
           label="Language Code"
           description={
             <Box>
-              Amazon Polly language code (e.g., en-US, arb, cmn-CN). 
-              <Link external href="https://docs.aws.amazon.com/polly/latest/dg/available-voices.html">
+              Amazon Polly language code (e.g., en-US, arb, cmn-CN).
+              <Link
+                external
+                href="https://docs.aws.amazon.com/polly/latest/dg/available-voices.html"
+              >
                 View all supported language codes
               </Link>
             </Box>
@@ -121,7 +122,7 @@ export default function AddLocaleModal({
           />
         </FormField>
 
-        <Alert statusIconAriaLabel="Info" type="info">
+        <Alert type="info">
           <Box variant="small">
             <strong>Common Amazon Polly language codes:</strong>
             <ul>
@@ -136,7 +137,10 @@ export default function AddLocaleModal({
               <li>da-DK - Danish</li>
               <li>pt-BR - Portuguese (Brazil)</li>
             </ul>
-            <Link external href="https://docs.aws.amazon.com/polly/latest/dg/available-voices.html">
+            <Link
+              external
+              href="https://docs.aws.amazon.com/polly/latest/dg/available-voices.html"
+            >
               See complete list of supported language codes
             </Link>
           </Box>

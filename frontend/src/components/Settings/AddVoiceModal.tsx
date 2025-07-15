@@ -18,7 +18,6 @@ interface AddVoiceModalProps {
   existingVoices: string[];
 }
 
-
 export default function AddVoiceModal({
   visible,
   onDismiss,
@@ -54,7 +53,6 @@ export default function AddVoiceModal({
     onDismiss();
   };
 
-
   return (
     <Modal
       onDismiss={handleClose}
@@ -75,18 +73,17 @@ export default function AddVoiceModal({
       }
     >
       <SpaceBetween direction="vertical" size="l">
-        {error && (
-          <Alert statusIconAriaLabel="Error" type="error">
-            {error}
-          </Alert>
-        )}
+        {error && <Alert type="error">{error}</Alert>}
 
         <FormField
           label="Voice ID"
           description={
             <Box>
-              Enter an Amazon Polly voice ID. 
-              <Link external href="https://docs.aws.amazon.com/polly/latest/dg/available-voices.html">
+              Enter an Amazon Polly voice ID.
+              <Link
+                external
+                href="https://docs.aws.amazon.com/polly/latest/dg/available-voices.html"
+              >
                 View all available voices
               </Link>
             </Box>

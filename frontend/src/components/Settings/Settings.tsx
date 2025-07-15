@@ -53,31 +53,34 @@ export default function Settings() {
   // Mock function to handle adding a voice to a locale
   const handleAddVoice = (voiceId: string) => {
     if (!editingLocale) return;
-    
-    setLocales(locales.map(locale => 
-      locale.code === editingLocale 
-        ? { ...locale, voices: [...locale.voices, voiceId] }
-        : locale
-    ));
+
+    setLocales(
+      locales.map((locale) =>
+        locale.code === editingLocale
+          ? { ...locale, voices: [...locale.voices, voiceId] }
+          : locale
+      )
+    );
     setShowAddVoiceModal(false);
     setEditingLocale(null);
     setHasUnsavedChanges(true);
   };
 
-
   // Mock function to handle removing a voice
   const handleRemoveVoice = (localeCode: string, voiceId: string) => {
-    setLocales(locales.map(locale => 
-      locale.code === localeCode 
-        ? { ...locale, voices: locale.voices.filter(id => id !== voiceId) }
-        : locale
-    ));
+    setLocales(
+      locales.map((locale) =>
+        locale.code === localeCode
+          ? { ...locale, voices: locale.voices.filter((id) => id !== voiceId) }
+          : locale
+      )
+    );
     setHasUnsavedChanges(true);
   };
 
   // Mock function to handle deleting a locale
   const handleDeleteLocale = (localeCode: string) => {
-    setLocales(locales.filter(locale => locale.code !== localeCode));
+    setLocales(locales.filter((locale) => locale.code !== localeCode));
     setHasUnsavedChanges(true);
   };
 
@@ -87,10 +90,10 @@ export default function Settings() {
     try {
       // TODO: Implement API call to save settings
       console.log('Saving locales:', locales);
-      
+
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -102,7 +105,7 @@ export default function Settings() {
   if (!isAdmin()) {
     return (
       <Container>
-        <Alert statusIconAriaLabel="Error" type="error">
+        <Alert type="error">
           Access denied. Only administrators can access settings.
         </Alert>
       </Container>
@@ -135,8 +138,9 @@ export default function Settings() {
 
       {/* Unsaved changes alert */}
       {hasUnsavedChanges && (
-        <Alert statusIconAriaLabel="Warning" type="warning">
-          You have unsaved changes. Click "Save Settings" to commit your changes.
+        <Alert type="warning">
+          You have unsaved changes. Click "Save Settings" to commit your
+          changes.
         </Alert>
       )}
 
@@ -213,7 +217,7 @@ export default function Settings() {
         visible={showAddLocaleModal}
         onDismiss={() => setShowAddLocaleModal(false)}
         onSubmit={handleAddLocale}
-        existingLocales={locales.map(l => l.code)}
+        existingLocales={locales.map((l) => l.code)}
       />
 
       <AddVoiceModal
@@ -223,8 +227,10 @@ export default function Settings() {
           setEditingLocale(null);
         }}
         onSubmit={handleAddVoice}
-        localeName={locales.find(l => l.code === editingLocale)?.name || ''}
-        existingVoices={locales.find(l => l.code === editingLocale)?.voices || []}
+        localeName={locales.find((l) => l.code === editingLocale)?.name || ''}
+        existingVoices={
+          locales.find((l) => l.code === editingLocale)?.voices || []
+        }
       />
     </SpaceBetween>
   );

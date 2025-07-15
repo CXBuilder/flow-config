@@ -71,7 +71,10 @@ async function listFlowConfigs(
     });
 
     const response = await docClient.send(scanCommand);
-    const flowConfigs = response.Items || [];
+    const allItems = response.Items || [];
+
+    // Filter out settings record and get only flow configs
+    const flowConfigs = allItems.filter((item) => item.id !== 'application-settings');
 
     // Get query parameters for filtering
     const pattern = event.queryStringParameters?.pattern;

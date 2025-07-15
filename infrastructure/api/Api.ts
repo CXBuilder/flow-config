@@ -20,6 +20,7 @@ import {
 import { Init } from './Init';
 import { FlowConfig } from './FlowConfig';
 import { PreviewSpeech } from './PreviewSpeech';
+import { Settings } from './Settings';
 import { parse } from 'yaml';
 import { readFileSync } from 'fs';
 import { FlowConfigStack } from '../FlowConfigStack';
@@ -69,6 +70,7 @@ export class Api extends Construct {
     const usersLambda = new Users(this).lambda;
     const flowConfigLambda = new FlowConfig(this).lambda;
     const previewSpeechLambda = new PreviewSpeech(this).lambda;
+    const settingsLambda = new Settings(this).lambda;
     const staticLambda = this.staticHosting.handler;
 
     // Update Authorizer Provider ARN
@@ -101,6 +103,8 @@ export class Api extends Construct {
     setLambdaIntegration('/api/flow-config/{id}', 'delete', flowConfigLambda);
     setLambdaIntegration('/api/flow-config/preview', 'post', flowConfigLambda);
     setLambdaIntegration('/api/preview-speech', 'post', previewSpeechLambda);
+    setLambdaIntegration('/api/settings', 'get', settingsLambda);
+    setLambdaIntegration('/api/settings', 'post', settingsLambda);
     setLambdaIntegration('/{proxy+}', 'get', staticLambda);
     setLambdaIntegration('/', 'get', staticLambda);
 
@@ -118,6 +122,7 @@ export class Api extends Construct {
     usersLambda.grantInvoke(apiGatewayPrincipal);
     flowConfigLambda.grantInvoke(apiGatewayPrincipal);
     previewSpeechLambda.grantInvoke(apiGatewayPrincipal);
+    settingsLambda.grantInvoke(apiGatewayPrincipal);
     staticLambda.grantInvoke(apiGatewayPrincipal);
 
     this.url = this.vpcEndpoint

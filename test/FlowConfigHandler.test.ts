@@ -171,6 +171,40 @@ describe('FlowConfig.handler Unit Tests', () => {
       expect(body.items).toHaveLength(1);
       expect(body.items[0].id).toBe(testFlowConfig.id);
     });
+
+    it('should exclude settings record from flow config list', async () => {
+      const settingsRecord = {
+        id: 'application-settings',
+        settings: {
+          locales: [
+            {
+              code: 'en-US',
+              name: 'English (US)',
+              voices: ['Joanna', 'Matthew'],
+            },
+          ],
+        },
+        lastModified: '2023-01-01T00:00:00.000Z',
+        lastModifiedBy: 'test-user',
+      };
+
+      // Mock DynamoDB Scan to return flow config and settings record
+      ddbDocMock.on(ScanCommand).resolves({
+        Items: [testFlowConfig, settingsRecord],
+        Count: 2,
+      });
+
+      const event = makeEvent('GET', '/api/flow-config');
+      const result = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body || '{}');
+      
+      // Should only return the flow config, not the settings record
+      expect(body.items).toHaveLength(1);
+      expect(body.items[0].id).toBe(testFlowConfig.id);
+      expect(body.items[0].id).not.toBe('application-settings');
+    });
   });
 
   describe('GET /api/flow-config/{id} (Get Specific Flow Config)', () => {
