@@ -114,6 +114,12 @@ export interface FlowConfigStackProps extends cdk.StackProps {
    * If undefined, creates a single-region table.
    */
   readonly globalTable?: GlobalTableConfig;
+
+  /**
+   * Set to false to remove CXBuilder branding from the web app.
+   * @default true
+   */
+  readonly branding?: boolean;
 }
 
 export class FlowConfigStack extends cdk.Stack {

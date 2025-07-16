@@ -59,6 +59,7 @@ export const handler = async (
         region: env.AWS_REGION ?? 'us-east-1',
         userPoolId: env.userPoolId,
         clientId: outputs.outputs.UserPoolClientId,
+        branding: env.branding === 'true' ? true : false,
       };
     }
 

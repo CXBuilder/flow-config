@@ -287,6 +287,7 @@ export interface components {
             region: string;
             userPoolId: string;
             clientId: string;
+            branding: boolean;
         };
         /** @description Describe the Connect user */
         User: {

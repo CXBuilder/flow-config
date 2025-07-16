@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-07-15
+## [2.0.0] - 2025-07-16
 
 - Add an admin page where users can select available locale an available voice ids.
 - Add ability to import/export configs
 - Fix Private API GW URL
 - Sort flows/prompts/variables by name
+- Add ability to remove CXBuilder branding from frontend
 
 ### v2.0.0 Breaking Changes
 
