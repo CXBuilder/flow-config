@@ -4,841 +4,841 @@
  */
 
 export interface paths {
-  '/api/init': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Get the run-time configuration for the frontend, such as auth */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Successful operation */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['InitResponse'];
-          };
+    "/api/init": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/users/{userId}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Get the current user information from Amazon Connect */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Successful operation */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['User'];
-          };
+        /** @description Get the run-time configuration for the frontend, such as auth */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful operation */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InitResponse"];
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/flow-config': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List flow configs
-     * @description Returns a list of flow configs that the user has access to
-     */
-    get: operations['listFlowConfigs'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/flow-config/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a specific flow config
-     * @description Returns a specific flow config by ID
-     */
-    get: operations['getFlowConfig'];
-    put?: never;
-    /**
-     * Create or update a flow config
-     * @description Creates a new flow config or updates an existing one
-     */
-    post: operations['saveFlowConfig'];
-    /**
-     * Delete a flow config
-     * @description Deletes a specific flow config by ID
-     */
-    delete: operations['deleteFlowConfig'];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/flow-config/preview': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Preview how the flow will see the config
-     * @description Executes the get-config lambda to preview how connect will see the data with a provided flow config object
-     */
-    post: operations['previewFlowConfigSpeech'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/settings': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get application settings
-     * @description Returns the current application settings including configured locales and voices
-     */
-    get: operations['getSettings'];
-    put?: never;
-    /**
-     * Update application settings
-     * @description Updates the application settings including configured locales and voices. Admin access required.
-     */
-    post: operations['updateSettings'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/preview-speech': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Preview speech using Amazon Polly
-     * @description Calls the Amazon Polly Synthesize Speech API and returns the resulting audio stream
-     */
-    post: operations['previewSpeech'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/{proxy+}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Serve static frontend files
-     * @description Serves static frontend assets and handles SPA routing
-     */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          proxy: string;
+    "/api/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Static file served successfully */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'text/html': string;
-            'text/css': string;
-            'application/javascript': string;
-            'image/*': string;
-          };
+        /** @description Get the current user information from Amazon Connect */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Successful operation */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["User"];
+                    };
+                };
+            };
         };
-        /** @description File not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/flow-config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
+        /**
+         * List flow configs
+         * @description Returns a list of flow configs that the user has access to
+         */
+        get: operations["listFlowConfigs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Serve frontend root
-     * @description Serves the main frontend application (index.html)
-     */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Frontend application served successfully */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'text/html': string;
-          };
+    "/api/flow-config/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
+        /**
+         * Get a specific flow config
+         * @description Returns a specific flow config by ID
+         */
+        get: operations["getFlowConfig"];
+        put?: never;
+        /**
+         * Create or update a flow config
+         * @description Creates a new flow config or updates an existing one
+         */
+        post: operations["saveFlowConfig"];
+        /**
+         * Delete a flow config
+         * @description Deletes a specific flow config by ID
+         */
+        delete: operations["deleteFlowConfig"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/flow-config/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview how the flow will see the config
+         * @description Executes the get-config lambda to preview how connect will see the data with a provided flow config object
+         */
+        post: operations["previewFlowConfigSpeech"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get application settings
+         * @description Returns the current application settings including configured locales and voices
+         */
+        get: operations["getSettings"];
+        put?: never;
+        /**
+         * Update application settings
+         * @description Updates the application settings including configured locales and voices. Admin access required.
+         */
+        post: operations["updateSettings"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/preview-speech": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview speech using Amazon Polly
+         * @description Calls the Amazon Polly Synthesize Speech API and returns the resulting audio stream
+         */
+        post: operations["previewSpeech"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{proxy+}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Serve static frontend files
+         * @description Serves static frontend assets and handles SPA routing
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    proxy: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Static file served successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/html": string;
+                        "text/css": string;
+                        "application/javascript": string;
+                        "image/*": string;
+                    };
+                };
+                /** @description File not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Serve frontend root
+         * @description Serves the main frontend application (index.html)
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Frontend application served successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/html": string;
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    /** @description Provides run-time configuration to the frontend app */
-    InitResponse: {
-      region: string;
-      userPoolId?: string;
-      clientId?: string;
-      branding: boolean;
-    };
-    /** @description Describe the Connect user */
-    User: {
-      Id?: string;
-      Arn?: string;
-      Username?: string;
-      IdentityInfo?: {
-        FirstName?: string;
-        LastName?: string;
-        Email?: string;
-        SecondaryEmail?: string;
-        Mobile?: string;
-      };
-      PhoneConfig?: {
-        PhoneType?: string;
-        AutoAccept?: boolean;
-        AfterContactWorkTimeLimit?: number;
-        DeskPhoneNumber?: string;
-      };
-      DirectoryUserId?: string;
-      SecurityProfileIds?: string[];
-      RoutingProfileId?: string;
-      HierarchyGroupId?: string;
-      Tags?: {
-        [key: string]: string;
-      };
-      /** Format: date-time */
-      LastModifiedTime?: string;
-      LastModifiedRegion?: string;
-    };
-    FlowConfig: {
-      /** @description Unique identifier for the flow config */
-      id: string;
-      /** @description User-friendly description of the flow config */
-      description: string;
-      /** @description Key-value pairs of configurable variables */
-      variables: {
-        [key: string]: string;
-      };
-      /** @description Collection of prompts organized by name, language, and channel */
-      prompts: {
-        [key: string]: {
-          [key: string]: {
-            /** @description Text content for voice channel (may include SSML) */
-            voice: string;
-            /** @description Optional text content for chat channel */
-            chat?: string;
-          };
+    schemas: {
+        /** @description Provides run-time configuration to the frontend app */
+        InitResponse: {
+            region: string;
+            userPoolId?: string;
+            clientId?: string;
+            branding: boolean;
         };
-      };
+        /** @description Describe the Connect user */
+        User: {
+            Id?: string;
+            Arn?: string;
+            Username?: string;
+            IdentityInfo?: {
+                FirstName?: string;
+                LastName?: string;
+                Email?: string;
+                SecondaryEmail?: string;
+                Mobile?: string;
+            };
+            PhoneConfig?: {
+                PhoneType?: string;
+                AutoAccept?: boolean;
+                AfterContactWorkTimeLimit?: number;
+                DeskPhoneNumber?: string;
+            };
+            DirectoryUserId?: string;
+            SecurityProfileIds?: string[];
+            RoutingProfileId?: string;
+            HierarchyGroupId?: string;
+            Tags?: {
+                [key: string]: string;
+            };
+            /** Format: date-time */
+            LastModifiedTime?: string;
+            LastModifiedRegion?: string;
+        };
+        FlowConfig: {
+            /** @description Unique identifier for the flow config */
+            id: string;
+            /** @description User-friendly description of the flow config */
+            description: string;
+            /** @description Key-value pairs of configurable variables */
+            variables: {
+                [key: string]: string;
+            };
+            /** @description Collection of prompts organized by name, language, and channel */
+            prompts: {
+                [key: string]: {
+                    [key: string]: {
+                        /** @description Text content for voice channel (may include SSML) */
+                        voice: string;
+                        /** @description Optional text content for chat channel */
+                        chat?: string;
+                    };
+                };
+            };
+        };
+        FlowConfigList: {
+            items?: components["schemas"]["FlowConfigSummary"][];
+        };
+        FlowConfigSummary: {
+            /** @description Unique identifier for the flow config */
+            id?: string;
+            /** @description User-friendly description of the flow config */
+            description?: string;
+            /**
+             * @description User's access level for this flow config
+             * @enum {string}
+             */
+            accessLevel?: "Full" | "Edit" | "Read";
+        };
+        Error: {
+            code?: string;
+            message?: string;
+            details?: Record<string, never>;
+        };
+        /** @description Request parameters for speech synthesis using Amazon Polly */
+        SpeechPreviewRequest: {
+            /**
+             * @description Language code (e.g., en-US, es-US)
+             * @example en-US
+             */
+            languageCode: string;
+            /**
+             * @description Amazon Polly voice ID
+             * @example Joanna
+             */
+            voiceId: string;
+            /**
+             * @description Text to synthesize (may include SSML)
+             * @example <speak>Hello, welcome to our service.</speak>
+             */
+            text: string;
+        };
+        /** @description Request parameters for previewing flow config data */
+        FlowConfigPreviewRequest: {
+            /** @description The flow config object to preview */
+            flowConfig: components["schemas"]["FlowConfig"];
+            /** @description Language code (e.g., en-US, es-US) */
+            lang: string;
+            /**
+             * @description Channel type for the prompt
+             * @enum {string}
+             */
+            channel: "voice" | "chat";
+        };
+        /** @description Locale configuration with available voices */
+        Locale: {
+            /**
+             * @description Amazon Polly language code (e.g., en-US, arb, cmn-CN)
+             * @example en-US
+             */
+            code: string;
+            /**
+             * @description Human-readable display name for the locale
+             * @example English (United States)
+             */
+            name: string;
+            /** @description Array of Amazon Polly voice IDs available for this locale */
+            voices: string[];
+        };
+        /** @description Application settings including locale and voice configurations */
+        Settings: {
+            /** @description Array of configured locales with their available voices */
+            locales: components["schemas"]["Locale"][];
+        };
     };
-    FlowConfigList: {
-      items?: components['schemas']['FlowConfigSummary'][];
-    };
-    FlowConfigSummary: {
-      /** @description Unique identifier for the flow config */
-      id?: string;
-      /** @description User-friendly description of the flow config */
-      description?: string;
-      /**
-       * @description User's access level for this flow config
-       * @enum {string}
-       */
-      accessLevel?: 'Full' | 'Edit' | 'Read';
-    };
-    Error: {
-      code?: string;
-      message?: string;
-      details?: Record<string, never>;
-    };
-    /** @description Request parameters for speech synthesis using Amazon Polly */
-    SpeechPreviewRequest: {
-      /**
-       * @description Language code (e.g., en-US, es-US)
-       * @example en-US
-       */
-      languageCode: string;
-      /**
-       * @description Amazon Polly voice ID
-       * @example Joanna
-       */
-      voiceId: string;
-      /**
-       * @description Text to synthesize (may include SSML)
-       * @example <speak>Hello, welcome to our service.</speak>
-       */
-      text: string;
-    };
-    /** @description Request parameters for previewing flow config data */
-    FlowConfigPreviewRequest: {
-      /** @description The flow config object to preview */
-      flowConfig: components['schemas']['FlowConfig'];
-      /** @description Language code (e.g., en-US, es-US) */
-      lang: string;
-      /**
-       * @description Channel type for the prompt
-       * @enum {string}
-       */
-      channel: 'voice' | 'chat';
-    };
-    /** @description Locale configuration with available voices */
-    Locale: {
-      /**
-       * @description Amazon Polly language code (e.g., en-US, arb, cmn-CN)
-       * @example en-US
-       */
-      code: string;
-      /**
-       * @description Human-readable display name for the locale
-       * @example English (United States)
-       */
-      name: string;
-      /** @description Array of Amazon Polly voice IDs available for this locale */
-      voices: string[];
-    };
-    /** @description Application settings including locale and voice configurations */
-    Settings: {
-      /** @description Array of configured locales with their available voices */
-      locales: components['schemas']['Locale'][];
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  listFlowConfigs: {
-    parameters: {
-      query?: {
-        /** @description Optional pattern to filter flow configs by ID */
-        pattern?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
+    listFlowConfigs: {
+        parameters: {
+            query?: {
+                /** @description Optional pattern to filter flow configs by ID */
+                pattern?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FlowConfigList"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Successful operation */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getFlowConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the flow config to retrieve */
+                id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['FlowConfigList'];
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FlowConfig"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Flow config not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
     };
-  };
-  getFlowConfig: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description ID of the flow config to retrieve */
-        id: string;
-      };
-      cookie?: never;
+    saveFlowConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the flow config to create or update */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Flow config object */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowConfig"];
+            };
+        };
+        responses: {
+            /** @description Flow config updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FlowConfig"];
+                };
+            };
+            /** @description Flow config created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FlowConfig"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Payload too large (exceeds DynamoDB size limits) */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Successful operation */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    deleteFlowConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the flow config to delete */
+                id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['FlowConfig'];
+        requestBody?: never;
+        responses: {
+            /** @description Flow config deleted successfully */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Flow config not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Flow config not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
     };
-  };
-  saveFlowConfig: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description ID of the flow config to create or update */
-        id: string;
-      };
-      cookie?: never;
+    previewFlowConfigSpeech: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Flow config and preview parameters */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FlowConfigPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/mpeg": string;
+                };
+            };
+            /** @description Invalid input or prompt not found */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Flow config or prompt not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
     };
-    /** @description Flow config object */
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FlowConfig'];
-      };
+    getSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settings"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden - Admin access required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
     };
-    responses: {
-      /** @description Flow config updated successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    updateSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          'application/json': components['schemas']['FlowConfig'];
+        /** @description Settings object */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Settings"];
+            };
         };
-      };
-      /** @description Flow config created successfully */
-      201: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Settings updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settings"];
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Forbidden - Admin access required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Payload too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
         };
-        content: {
-          'application/json': components['schemas']['FlowConfig'];
-        };
-      };
-      /** @description Invalid input */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Payload too large (exceeds DynamoDB size limits) */
-      413: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
     };
-  };
-  deleteFlowConfig: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description ID of the flow config to delete */
-        id: string;
-      };
-      cookie?: never;
+    previewSpeech: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Speech synthesis parameters */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpeechPreviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/mpeg": string;
+                };
+            };
+            /** @description Invalid input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Text too large for synthesis */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
     };
-    requestBody?: never;
-    responses: {
-      /** @description Flow config deleted successfully */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Flow config not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  previewFlowConfigSpeech: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Flow config and preview parameters */
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['FlowConfigPreviewRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful operation */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'audio/mpeg': string;
-        };
-      };
-      /** @description Invalid input or prompt not found */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Flow config or prompt not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  getSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful operation */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Settings'];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden - Admin access required */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  updateSettings: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Settings object */
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['Settings'];
-      };
-    };
-    responses: {
-      /** @description Settings updated successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Settings'];
-        };
-      };
-      /** @description Invalid input */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Forbidden - Admin access required */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Payload too large */
-      413: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
-  previewSpeech: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** @description Speech synthesis parameters */
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['SpeechPreviewRequest'];
-      };
-    };
-    responses: {
-      /** @description Successful operation */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'audio/mpeg': string;
-        };
-      };
-      /** @description Invalid input */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-      /** @description Text too large for synthesis */
-      413: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['Error'];
-        };
-      };
-    };
-  };
 }

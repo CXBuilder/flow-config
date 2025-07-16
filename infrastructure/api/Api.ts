@@ -135,8 +135,8 @@ export class Api extends Construct {
     settingsLambda.grantInvoke(apiGatewayPrincipal);
     staticLambda.grantInvoke(apiGatewayPrincipal);
 
-    this.url = vpcConfig?.vpcEndpoint
-      ? `https://${this.restApi.restApiId}-${vpcConfig.vpcEndpoint.vpcEndpointId}.execute-api.${stack.region}.amazonaws.com/prod`
+    this.url = this.vpcEndpoint
+      ? `https://${this.restApi.restApiId}-${this.vpcEndpoint.vpcEndpointId}.execute-api.${stack.region}.amazonaws.com/prod`
       : `https://${this.restApi.restApiId}.execute-api.${stack.region}.amazonaws.com/prod`;
   }
 
