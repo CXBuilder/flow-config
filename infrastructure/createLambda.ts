@@ -45,10 +45,16 @@ export function createLambda<TEnv>(
     // Try alternative location in ../dist/backend
     codeLocation = resolve(__dirname, '..', 'dist', 'backend', backendId);
     expectedIndexFile = resolve(codeLocation, 'index.js');
-    
+
     if (!existsSync(expectedIndexFile)) {
       throw new Error(
-        `Lambda function ${backendId} bundled code not found at: ${expectedIndexFile} or ${resolve(__dirname, '..', 'backend', backendId, 'index.js')}. ` +
+        `Lambda function ${backendId} bundled code not found at: ${expectedIndexFile} or ${resolve(
+          __dirname,
+          '..',
+          'backend',
+          backendId,
+          'index.js'
+        )}. ` +
           'Please run "npm run build:lambdas" to bundle the Lambda functions.'
       );
     }

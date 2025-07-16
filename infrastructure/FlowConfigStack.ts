@@ -36,9 +36,24 @@ export interface CognitoConfig {
 }
 
 /**
- * VPC configuration for private deployment using string IDs
+ * VPC configuration for API Gateway
+ * If provided, the API will be deployed in a private VPC.
  */
-export interface VpcConfig {
+export interface ApiVpcConfig {
+  /**
+   * The VPC ID to use for the API
+   */
+  readonly vpcId: string;
+  /**
+   * The VPC endpoint ID to use for the API
+   */
+  readonly vpcEndpointId: string;
+}
+
+/**
+ * Lambda VPC configuration
+ */
+export interface LambdaVpcConfig {
   /**
    * The VPC ID to deploy resources into
    */
@@ -47,17 +62,12 @@ export interface VpcConfig {
   /**
    * Security group IDs for Lambda functions
    */
-  readonly lambdaSecurityGroupIds: string[];
+  readonly securityGroupIds: string[];
 
   /**
    * Private subnet IDs for Lambda functions
    */
-  readonly privateSubnetIds: string[];
-
-  /**
-   * Security group IDs for VPC endpoints
-   */
-  readonly vpcEndpointSecurityGroupIds: string[];
+  readonly subnetIds: string[];
 }
 
 /**
@@ -83,7 +93,6 @@ export interface ResolvedVpcConfig {
   readonly vpc: IVpc;
   readonly lambdaSecurityGroups: ISecurityGroup[];
   readonly privateSubnets: ISubnet[];
-  readonly vpcEndpointSecurityGroups: ISecurityGroup[];
 }
 
 export interface FlowConfigStackProps extends cdk.StackProps {
@@ -102,11 +111,15 @@ export interface FlowConfigStackProps extends cdk.StackProps {
   readonly prod?: boolean;
 
   /**
-   * VPC configuration for private deployment.
-   * If provided, the application will be configured for VPC-only access.
-   * If undefined, uses the current public configuration.
+   * If provided, the API will be deployed in a VPC.
    */
-  readonly vpc?: VpcConfig;
+  readonly apiVpcConfig?: ApiVpcConfig;
+
+  /**
+   * If provided, the Lambda functions will be deployed in a VPC.
+   * Note: VPC should contain endpoints to: CloudFormation, Lambda, DynamoDB, SNS, and Polly.
+   */
+  readonly lambdaVpcConfig?: LambdaVpcConfig;
 
   /**
    * Global table configuration for multi-region deployments.
@@ -156,7 +169,7 @@ export class FlowConfigStack extends cdk.Stack {
       cognito,
       alertEmails,
       prod = false,
-      vpc,
+      lambdaVpcConfig,
       globalTable,
     } = props;
     super(scope, id, {
@@ -169,7 +182,9 @@ export class FlowConfigStack extends cdk.Stack {
     });
 
     // Resolve VPC configuration if provided
-    this._resolvedVpcConfig = vpc ? this.resolveVpcConfig(vpc) : undefined;
+    this._resolvedVpcConfig = lambdaVpcConfig
+      ? this.resolveVpcConfig(lambdaVpcConfig)
+      : undefined;
 
     // DynamoDB table for storing flow configs
     this.table = this.createTable(prefix, prod, globalTable);
@@ -387,19 +402,14 @@ export class FlowConfigStack extends cdk.Stack {
   /**
    * Resolve VPC configuration string IDs to CDK objects
    */
-  private resolveVpcConfig(vpcConfig: VpcConfig): ResolvedVpcConfig {
-    const {
-      vpcId,
-      lambdaSecurityGroupIds,
-      privateSubnetIds,
-      vpcEndpointSecurityGroupIds,
-    } = vpcConfig;
+  private resolveVpcConfig(vpcConfig: LambdaVpcConfig): ResolvedVpcConfig {
+    const { vpcId, securityGroupIds, subnetIds } = vpcConfig;
 
     // Resolve VPC
     const vpc = ec2.Vpc.fromLookup(this, 'ResolvedVpc', { vpcId });
 
     // Resolve Lambda security groups
-    const lambdaSecurityGroups = lambdaSecurityGroupIds.map((sgId, index) =>
+    const lambdaSecurityGroups = securityGroupIds.map((sgId, index) =>
       ec2.SecurityGroup.fromSecurityGroupId(
         this,
         `LambdaSecurityGroup${index}`,
@@ -408,25 +418,14 @@ export class FlowConfigStack extends cdk.Stack {
     );
 
     // Resolve private subnets
-    const privateSubnets = privateSubnetIds.map((subnetId, index) =>
+    const privateSubnets = subnetIds.map((subnetId, index) =>
       ec2.Subnet.fromSubnetId(this, `PrivateSubnet${index}`, subnetId)
-    );
-
-    // Resolve VPC endpoint security groups
-    const vpcEndpointSecurityGroups = vpcEndpointSecurityGroupIds.map(
-      (sgId, index) =>
-        ec2.SecurityGroup.fromSecurityGroupId(
-          this,
-          `VpcEndpointSecurityGroup${index}`,
-          sgId
-        )
     );
 
     return {
       vpc,
       lambdaSecurityGroups,
       privateSubnets,
-      vpcEndpointSecurityGroups,
     };
   }
 }

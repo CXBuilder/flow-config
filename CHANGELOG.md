@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed the `-get-config` suffix from the Amazon Connect lambda to reduce function name length. Lambda name now matches the app prefix.
 - Use `event.Details.ContactData.LanguageCode` instead of `event.Details.ContactData.Attributes.lang`
   - The lang parameter is still available.
+- Split VPC configuration parameters into: `apiVpcConfig` and `lambdaVpcConfig`
 
 ## [1.1.0] - 2025-06-23
 

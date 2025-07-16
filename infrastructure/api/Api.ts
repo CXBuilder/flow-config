@@ -14,8 +14,8 @@ import {
   ServicePrincipal,
 } from 'aws-cdk-lib/aws-iam';
 import {
+  IInterfaceVpcEndpoint,
   InterfaceVpcEndpoint,
-  InterfaceVpcEndpointAwsService,
 } from 'aws-cdk-lib/aws-ec2';
 import { Init } from './Init';
 import { FlowConfig } from './FlowConfig';
@@ -30,7 +30,7 @@ import { Static } from './Static';
 export class Api extends Construct {
   readonly staticHosting: Static;
   readonly restApi: SpecRestApi;
-  readonly vpcEndpoint?: InterfaceVpcEndpoint;
+  readonly vpcEndpoint?: IInterfaceVpcEndpoint;
   readonly url: string;
 
   constructor(public stack: FlowConfigStack) {
@@ -39,31 +39,32 @@ export class Api extends Construct {
     // Create static hosting construct first
     this.staticHosting = new Static(this);
 
-    // Configure API Gateway based on VPC settings
-    const vpcConfig = stack._getResolvedVpcConfig();
-    const apiGatewayProps: RestApiBaseProps = vpcConfig
-      ? {
-          restApiName: stack.props.prefix,
-          endpointConfiguration: {
-            types: [EndpointType.PRIVATE],
-            vpcEndpoints: [
-              (this.vpcEndpoint = new InterfaceVpcEndpoint(
-                this,
-                'ApiVpcEndpoint',
-                {
-                  vpc: vpcConfig.vpc,
-                  service: InterfaceVpcEndpointAwsService.APIGATEWAY,
-                  subnets: { subnets: vpcConfig.privateSubnets },
-                  securityGroups: vpcConfig.vpcEndpointSecurityGroups,
-                }
-              )),
-            ],
-          },
-          policy: this.createVpcEndpointPolicy(vpcConfig.vpc.vpcId),
-        }
-      : {
-          restApiName: stack.props.prefix,
-        };
+    const { prefix, apiVpcConfig: apiVpcEndpoint } = stack.props;
+
+    this.vpcEndpoint = apiVpcEndpoint
+      ? InterfaceVpcEndpoint.fromInterfaceVpcEndpointAttributes(
+          this,
+          'ExistingVpcEndpoint',
+          {
+            vpcEndpointId: apiVpcEndpoint.vpcEndpointId,
+            port: 443,
+          }
+        )
+      : undefined;
+
+    const apiGatewayProps: RestApiBaseProps =
+      this.vpcEndpoint && apiVpcEndpoint?.vpcId
+        ? {
+            restApiName: prefix,
+            endpointConfiguration: {
+              types: [EndpointType.PRIVATE],
+              vpcEndpoints: [this.vpcEndpoint],
+            },
+            policy: this.createVpcEndpointPolicy(apiVpcEndpoint.vpcId),
+          }
+        : {
+            restApiName: prefix,
+          };
 
     // Create Lambda functions
     const initLambda = new Init(this).lambda;
