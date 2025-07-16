@@ -20,6 +20,7 @@ export class Init extends Construct {
       environment: {
         stackName: stackName,
         userPoolId: api.stack.props.cognito?.userPoolId,
+        branding: (api.stack.props.branding ?? true).toString(),
       },
       timeout: Duration.seconds(15),
       initialPolicy: [

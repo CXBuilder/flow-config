@@ -5,18 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-07-15
+## [2.0.0] - 2025-07-16
 
 - Add an admin page where users can select available locale an available voice ids.
 - Add ability to import/export configs
 - Fix Private API GW URL
 - Sort flows/prompts/variables by name
+- Add ability to remove CXBuilder branding from frontend
 
 ### v2.0.0 Breaking Changes
 
 - Removed the `-get-config` suffix from the Amazon Connect lambda to reduce function name length. Lambda name now matches the app prefix.
 - Use `event.Details.ContactData.LanguageCode` instead of `event.Details.ContactData.Attributes.lang`
   - The lang parameter is still available.
+- Split VPC configuration parameters into: `apiVpcConfig` and `lambdaVpcConfig`
 
 ## [1.1.0] - 2025-06-23
 

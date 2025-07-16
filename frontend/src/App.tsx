@@ -14,10 +14,12 @@ import { AdminSettings } from './components/Settings';
 import { usePermissions } from './hooks/usePermissions';
 import { useContext, useState, useEffect } from 'react';
 import { CognitoAuthenticationContext } from './contexts/CognitoAuthenticationProvider';
+import { useConfiguration } from './hooks/useConfiguration';
 
 function App() {
   const { hasAnyAccess, isAdmin } = usePermissions();
   const tokenProvider = useContext(CognitoAuthenticationContext);
+  const { branding } = useConfiguration();
   const [userName, setUserName] = useState<string>();
   const [activeTab, setActiveTab] = useState('flow-configs');
 
@@ -78,30 +80,32 @@ function App() {
       </div>
 
       {/* Footer - sticks to bottom */}
-      <Box textAlign="center" padding="l">
-        <TextContent>
-          <Box variant="small" color="text-body-secondary">
-            <SpaceBetween direction="horizontal" size="m" alignItems="center">
-              <span>Built by</span>
-              <Link
-                external
-                href="https://www.cxbuilder.ai"
-                ariaLabel="Visit CXBuilder website"
-              >
-                CXBuilder
-              </Link>
-              <span>•</span>
-              <Link
-                external
-                href="https://github.com/CXBuilder/flow-config"
-                ariaLabel="View source code on GitHub"
-              >
-                @cxbuilder/flow-config
-              </Link>
-            </SpaceBetween>
-          </Box>
-        </TextContent>
-      </Box>
+      {branding && (
+        <Box textAlign="center" padding="l">
+          <TextContent>
+            <Box variant="small" color="text-body-secondary">
+              <SpaceBetween direction="horizontal" size="m" alignItems="center">
+                <span>Built by</span>
+                <Link
+                  external
+                  href="https://www.cxbuilder.ai"
+                  ariaLabel="Visit CXBuilder website"
+                >
+                  CXBuilder
+                </Link>
+                <span>•</span>
+                <Link
+                  external
+                  href="https://github.com/CXBuilder/flow-config"
+                  ariaLabel="View source code on GitHub"
+                >
+                  @cxbuilder/flow-config
+                </Link>
+              </SpaceBetween>
+            </Box>
+          </TextContent>
+        </Box>
+      )}
     </div>
   );
 }

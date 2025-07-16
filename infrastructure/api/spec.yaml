@@ -21,6 +21,7 @@ components:
       additionalProperties: false
       required:
         - region
+        - branding
       properties:
         region:
           type: string
@@ -28,6 +29,8 @@ components:
           type: string
         clientId:
           type: string
+        branding:
+          type: boolean
     User:
       type: object
       description: Describe the Connect user

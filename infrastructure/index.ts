@@ -3,6 +3,7 @@ export {
   FlowConfigStack,
   FlowConfigStackProps,
   CognitoConfig,
-  VpcConfig,
+  ApiVpcConfig,
+  LambdaVpcConfig,
   GlobalTableConfig,
 } from './FlowConfigStack';

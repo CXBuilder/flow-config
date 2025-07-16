@@ -55,7 +55,7 @@ export const handler = async (
   try {
     if (!response) {
       const region = env.AWS_REGION ?? 'us-east-1';
-      
+
       if (env.userPoolId) {
         // Cognito is configured - include auth fields
         const outputs = await getStackOutputs(env.stackName);
@@ -63,11 +63,13 @@ export const handler = async (
           region,
           userPoolId: env.userPoolId,
           clientId: outputs.outputs.UserPoolClientId,
+          branding: env.branding === 'true' ? true : false,
         };
       } else {
         // Cognito is not configured - only include region
         response = {
           region,
+          branding: env.branding === 'true' ? true : false,
         };
       }
     }
