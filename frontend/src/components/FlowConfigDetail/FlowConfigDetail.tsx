@@ -67,7 +67,11 @@ export default function FlowConfigDetail({
         `/api/flow-config/${flowConfigId}`
       );
       if (result) {
-        setFlowConfig(result);
+        setFlowConfig({
+          ...result,
+          variables: result.variables || {},
+          prompts: result.prompts || {},
+        });
       }
     } catch (err) {
       setError('Failed to load flow configuration');
