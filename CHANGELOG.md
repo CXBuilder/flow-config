@@ -15,10 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### v2.0.0 Breaking Changes
 
+- Changed DDB from `Table` to `TableV2` to better support ACGR
+  - Mitigation: **Backup existing Flow Config table and delete it. Deploy the new version of the app. Restore your table backup.**
 - Removed the `-get-config` suffix from the Amazon Connect lambda to reduce function name length. Lambda name now matches the app prefix.
+  - Mitigation: Update your flows accordingly
 - Use `event.Details.ContactData.LanguageCode` instead of `event.Details.ContactData.Attributes.lang`
-  - The lang parameter is still available.
+  - Mitigation: take advantage fo the LanguageCode feature instead of using a `lang` attribute
+  - The `lang` parameter is still available for backwards compatibility - will be removed in a future version
 - Split VPC configuration parameters into: `apiVpcConfig` and `lambdaVpcConfig`
+  - Mitigation: migrate to the new props
 
 ## [1.1.0] - 2025-06-23
 
