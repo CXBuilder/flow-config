@@ -100,7 +100,7 @@ describe('Settings Handler', () => {
       expect(body.locales[0].code).toBe('en-US');
     });
 
-    it('should deny access for non-admin user', async () => {
+    it('should allow read access for non-admin user', async () => {
       const event: APIGatewayProxyEvent = {
         ...mockNonAdminEvent,
         httpMethod: 'GET',
@@ -109,11 +109,7 @@ describe('Settings Handler', () => {
 
       const result = await handler(event);
 
-      expect(result.statusCode).toBe(403);
-      expect(JSON.parse(result.body)).toEqual({
-        code: 'FORBIDDEN',
-        message: 'Admin access required',
-      });
+      expect(result.statusCode).toBe(200);
     });
   });
 

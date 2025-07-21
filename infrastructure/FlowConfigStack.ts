@@ -374,13 +374,13 @@ export class FlowConfigStack extends cdk.Stack {
 
     if (!globalTable) {
       // Single-region table
-      return new dynamodb.Table(this, 'FlowConfigsTable', {
+      return new dynamodb.TableV2(this, 'Table', {
         tableName,
         partitionKey: {
           name: 'id',
           type: dynamodb.AttributeType.STRING,
         },
-        billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+        billing: dynamodb.Billing.onDemand(),
         pointInTimeRecoverySpecification: {
           pointInTimeRecoveryEnabled: true,
         },
@@ -393,27 +393,38 @@ export class FlowConfigStack extends cdk.Stack {
 
     if (globalTable.isPrimaryRegion) {
       // Primary region creates global table with replicas
-      return new dynamodb.Table(this, 'FlowConfigsTable', {
+      const table = new dynamodb.TableV2(this, 'Table', {
         tableName,
         partitionKey: {
           name: 'id',
           type: dynamodb.AttributeType.STRING,
         },
-        billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+        billing: dynamodb.Billing.onDemand(),
         pointInTimeRecoverySpecification: {
           pointInTimeRecoveryEnabled: true,
         },
-        replicationRegions: globalTable.replicaRegions || [],
         deletionProtection: prod,
         removalPolicy: prod
           ? cdk.RemovalPolicy.RETAIN
           : cdk.RemovalPolicy.DESTROY,
       });
+      if (globalTable.replicaRegions) {
+        for (const region of globalTable.replicaRegions) {
+          table.addReplica({
+            region,
+            deletionProtection: prod,
+            pointInTimeRecoverySpecification: {
+              pointInTimeRecoveryEnabled: true,
+            },
+          });
+        }
+      }
+      return table;
     } else {
       // Secondary region references existing global table
       return dynamodb.Table.fromTableArn(
         this,
-        'FlowConfigsTable',
+        'Table',
         `arn:aws:dynamodb:${this.region}:${this.account}:table/${tableName}`
       );
     }

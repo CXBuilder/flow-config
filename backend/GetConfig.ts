@@ -16,7 +16,7 @@ interface GetConfigEvent {
     };
     ContactData: {
       Channel: string;
-      LanguageCode: string;
+      LanguageCode?: string;
     };
   };
 

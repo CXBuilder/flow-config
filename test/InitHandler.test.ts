@@ -12,6 +12,7 @@ const env: InitEnv = {
   stackName: 'unit-test',
   userPoolId: 'user-pool',
   AWS_REGION: 'us-east-1',
+  branding: 'true',
 };
 Object.assign(process.env, env);
 
