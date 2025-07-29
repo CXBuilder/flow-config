@@ -1,5 +1,10 @@
 # @cxbuilder/flow-config
 
+[![CI/CD Pipeline](https://github.com/cxbuilder/flow-config/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/cxbuilder/flow-config/actions/workflows/ci-cd.yml)
+[![npm version](https://badge.fury.io/js/@cxbuilder%2Fflow-config.svg)](https://badge.fury.io/js/@cxbuilder%2Fflow-config)
+[![PyPI version](https://badge.fury.io/py/cxbuilder-flow-config.svg)](https://badge.fury.io/py/cxbuilder-flow-config)
+[![View on Construct Hub](https://constructs.dev/badge?package=%40cxbuilder%2Fflow-config)](https://constructs.dev/packages/@cxbuilder/flow-config)
+
 AWS CDK constructs for Amazon Connect FlowConfig - a third-party app for configuring variables and prompts in Connect contact flows.
 
 ## Links
