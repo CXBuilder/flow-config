@@ -1,6 +1,6 @@
 {
   "name": "@cxbuilder/flow-config",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "license": "MIT",
   "description": "Amazon Connect third-party app for configuring variables and prompts in Connect contact flows",
   "author": {
@@ -46,7 +46,7 @@
     "cdk": "cdk",
     "check-version": "if test $(npm view $npm_package_name version) = $npm_package_version ; then echo \"You must increment package version\" ; exit 1 ; fi ",
     "clean": "rimraf dist",
-    "stage": "cdk-assets -v -p ./cdk.out/FlowConfigStack.assets.json publish",
+    "stage": "cdk-assets -v -p ./cdk.out/East.assets.json publish && cdk-assets -v -p ./cdk.out/West.assets.json publish",
     "synth": "npm run cdk -- synth --quiet",
     "synth2": "npm run synth -- -c stage=ccaastest",
     "diff": "npm run cdk -- diff",
