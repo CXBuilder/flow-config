@@ -294,9 +294,8 @@ export class FlowConfigStack extends cdk.Stack {
    */
   associate3pApp() {
     const {
-      props: { prefix, connectInstanceArn },
+      props: { prefix, connectInstanceArn, associate3pApp = true },
       appUrl: url,
-      associate3pApp = true,
     } = this;
 
     if (!associate3pApp) {
