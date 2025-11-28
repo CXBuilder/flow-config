@@ -4640,6 +4640,6 @@
       "symbolId": "infrastructure/FlowConfigStack:LambdaVpcConfig"
     }
   },
-  "version": "2.0.3",
-  "fingerprint": "W29i2opIl98/XvvGCbajMwT3sUdUa/lASZ3KdRUN898="
+  "version": "2.0.4",
+  "fingerprint": "XZhNO4JHgzfkRMUmJ7o9S8sJQV/51t8x5vF0UnvdFM0="
 }
