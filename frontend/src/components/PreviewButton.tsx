@@ -91,11 +91,12 @@ export function PreviewButton(props: PreviewButtonProps) {
   return (
     <Button
       iconName={playing ? 'audio-off' : 'audio-full'}
-      variant="icon"
       onClick={pollyButtonPressed}
       disabled={disabled}
       ariaLabel="Preview text-to-speech"
       formAction={'none'}
-    />
+    >
+      {playing ? 'Stop Preview' : 'Preview'}
+    </Button>
   );
 }

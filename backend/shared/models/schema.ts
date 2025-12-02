@@ -327,6 +327,18 @@ export interface components {
             variables: {
                 [key: string]: string;
             };
+            /** @description Schema definitions for variables (admin only) */
+            schema?: {
+                [key: string]: {
+                    /**
+                     * @description The data type for this variable
+                     * @enum {string}
+                     */
+                    type: "text" | "number" | "boolean" | "select";
+                    /** @description Available options (only for select type) */
+                    options?: string[];
+                };
+            };
             /** @description Collection of prompts organized by name, language, and channel */
             prompts: {
                 [key: string]: {

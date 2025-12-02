@@ -1,6 +1,6 @@
 {
   "name": "@cxbuilder/flow-config",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "license": "MIT",
   "description": "Amazon Connect third-party app for configuring variables and prompts in Connect contact flows",
   "author": {
