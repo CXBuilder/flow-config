@@ -28,11 +28,11 @@ jobs:
           npm ci
           npm ci --prefix frontend
 
-      - name: Run tests
-        run: npm test
-
       - name: Build package
         run: npm run build
+
+      - name: Run tests
+        run: npm test
 
       - name: Check version
         run: npm run check-version

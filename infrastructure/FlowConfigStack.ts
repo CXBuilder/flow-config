@@ -140,6 +140,13 @@ export interface FlowConfigStackProps extends cdk.StackProps {
    * @default true
    */
   readonly branding?: boolean;
+
+  /**
+   * Whether to associate the app with the Connect Agent Workspace.
+   * Set to false to disable automatic association.
+   * @default true
+   */
+  readonly associate3pApp?: boolean;
 }
 
 export class FlowConfigStack extends cdk.Stack {
@@ -302,13 +309,18 @@ export class FlowConfigStack extends cdk.Stack {
   }
 
   /**
-   * Associated Voicemail as Agent Workspace app
+   * Associate FlowConfig as Agent Workspace app
    */
   associate3pApp() {
     const {
-      props: { prefix, connectInstanceArn, securityProfiles = [] },
+      props: { prefix, connectInstanceArn, associate3pApp = true, securityProfiles = [] },
       appUrl: url,
     } = this;
+
+    if (!associate3pApp) {
+      return;
+    }
+
     let namespace = `cxbuilder.${prefix}`;
     if (namespace.length > 32 && !cdk.Token.isUnresolved(namespace)) {
       namespace = namespace.substring(0, 32);

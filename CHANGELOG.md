@@ -5,7 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-07-16
+## [TBD] - TBD
+
+- Added support to deploy the app without authentication for demo purposes only
+
+## [2.2.0] - 2025-12-02
+
+- Admins can control the variable type
+- Added role based user guides
+
+## [2.1.1] - 2025-10-08
+
+- Fixed `associate3pApp` prop reference in `associate3pApp()` method to properly read from props
+- Added Unit tests for FlowConfigStack to verify `associate3pApp` configuration behavior
+
+## [2.1.0] - 2025-10-08
+
+- Added `associate3pApp` stack prop which allow you turn off the automatic Agent Workspace app association
+
+## [2.0.0] - 2025-07-30
 
 - Add an admin page where users can select available locale an available voice ids.
 - Add ability to import/export configs
