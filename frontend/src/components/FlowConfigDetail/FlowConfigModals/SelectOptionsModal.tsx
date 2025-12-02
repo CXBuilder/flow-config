@@ -38,7 +38,13 @@ export function SelectOptionsModal({
       return;
     }
 
-    onSave(options);
+    // Remove duplicates
+    const uniqueOptions = [...new Set(options)];
+
+    // Clear error on successful validation
+    setError('');
+
+    onSave(uniqueOptions);
   };
 
   const handleDismiss = () => {
@@ -73,7 +79,11 @@ export function SelectOptionsModal({
         >
           <Textarea
             value={optionsText}
-            onChange={({ detail }) => setOptionsText(detail.value)}
+            onChange={({ detail }) => {
+              setOptionsText(detail.value);
+              // Clear error when user starts typing
+              if (error) setError('');
+            }}
             placeholder="yes&#10;no&#10;maybe"
             rows={6}
           />

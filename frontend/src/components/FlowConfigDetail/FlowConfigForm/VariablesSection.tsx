@@ -9,12 +9,26 @@ import {
   Select,
   Checkbox,
   SpaceBetween,
+  StatusIndicator,
+  Modal,
 } from '@cloudscape-design/components';
 import { FlowConfig } from '../../../shared';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { SelectOptionsModal } from '../FlowConfigModals/SelectOptionsModal';
 
 type SchemaType = 'text' | 'number' | 'boolean' | 'select';
+
+interface TypeChangeConfirmation {
+  key: string;
+  newType: SchemaType;
+  willLoseOptions: boolean;
+}
+
+type VariableItem = {
+  key: string;
+  value: string;
+  schema: { type: SchemaType; options?: string[] };
+};
 
 interface VariablesSectionProps {
   flowConfig: FlowConfig;
@@ -33,6 +47,7 @@ export function VariablesSection({
 }: VariablesSectionProps) {
   const { isAdmin } = usePermissions();
   const [optionsModalKey, setOptionsModalKey] = useState<string | null>(null);
+  const [typeChangeConfirmation, setTypeChangeConfirmation] = useState<TypeChangeConfirmation | null>(null);
 
   const variableItems = Object.entries(flowConfig.variables)
     .sort(([a], [b]) => a.localeCompare(b))
@@ -43,6 +58,17 @@ export function VariablesSection({
     }));
 
   const handleUpdateVariableValue = (key: string, newValue: string) => {
+    const schema = flowConfig.schema?.[key];
+
+    // Validate number type
+    if (schema?.type === 'number' && newValue !== '') {
+      const numValue = parseFloat(newValue);
+      if (isNaN(numValue)) {
+        // Invalid number, don't update
+        return;
+      }
+    }
+
     onUpdate({
       variables: {
         ...flowConfig.variables,
@@ -63,24 +89,46 @@ export function VariablesSection({
 
   const handleSchemaTypeChange = (key: string, newType: SchemaType) => {
     const currentSchema = flowConfig.schema || {};
+    const currentType = currentSchema[key]?.type || 'text';
+
+    // Check if changing from select type with options - warn about data loss
+    const willLoseOptions = currentType === 'select' &&
+                           newType !== 'select' &&
+                           (currentSchema[key]?.options?.length || 0) > 0;
+
+    if (willLoseOptions) {
+      setTypeChangeConfirmation({ key, newType, willLoseOptions: true });
+      return;
+    }
+
+    // No data loss, proceed directly
+    performSchemaTypeChange(key, newType);
+  };
+
+  const performSchemaTypeChange = (key: string, newType: SchemaType) => {
+    const currentSchema = flowConfig.schema || {};
+    const currentValue = flowConfig.variables[key];
     const newSchema = {
       ...currentSchema,
       [key]: {
         ...currentSchema[key],
         type: newType,
         // Clear options if not select type
-        options: newType === 'select' ? (currentSchema[key]?.options || []) : undefined,
+        options:
+          newType === 'select' ? currentSchema[key]?.options || [] : undefined,
       },
     };
 
     // Reset value based on new type
-    let newValue = flowConfig.variables[key];
+    let newValue = currentValue;
     if (newType === 'boolean') {
       newValue = 'false';
     } else if (newType === 'number') {
       newValue = '0';
     } else if (newType === 'select') {
-      newValue = '';  // Clear value for select - user must choose from options
+      // Preserve value if it exists in options, otherwise clear
+      const options = currentSchema[key]?.options || [];
+      newValue = options.includes(currentValue) ? currentValue : '';
     }
 
     onUpdate({
@@ -107,7 +155,7 @@ export function VariablesSection({
     setOptionsModalKey(null);
   };
 
-  const renderValueControl = (item: { key: string; value: string; schema: { type: SchemaType; options?: string[] } }) => {
+  const renderValueControl = (item: VariableItem) => {
     const { key, value, schema } = item;
 
     switch (schema.type) {
@@ -120,9 +168,9 @@ export function VariablesSection({
             }
             disabled={isReadOnly}
           >
-            <span style={{ color: value === 'true' ? '#0972d3' : '#d91515' }}>
+            <StatusIndicator type={value === 'true' ? 'success' : 'error'}>
               {value === 'true' ? 'true' : 'false'}
-            </span>
+            </StatusIndicator>
           </Checkbox>
         );
 
@@ -131,42 +179,48 @@ export function VariablesSection({
           <Input
             type="number"
             value={value}
-            onChange={({ detail }) => handleUpdateVariableValue(key, detail.value)}
+            onChange={({ detail }) =>
+              handleUpdateVariableValue(key, detail.value)
+            }
             placeholder="0"
             readOnly={isReadOnly}
           />
         );
 
-        case 'select':
-          const options = schema.options || [];
-          if (options.length === 0) {
-            return (
-              <span style={{ color: '#d91515', fontStyle: 'italic' }}>
-                Add options →
-              </span>
-            );
-          }
+      case 'select': {
+        const options = schema.options || [];
+        if (options.length === 0) {
           return (
-            <div style={{ position: 'relative', zIndex: 1000 }}>
-              <Select
-                selectedOption={value ? { label: value, value } : null}
-                onChange={({ detail }) =>
-                  handleUpdateVariableValue(key, detail.selectedOption?.value || '')
-                }
-                options={options.map((opt) => ({ label: opt, value: opt }))}
-                placeholder="Select a value"
-                disabled={isReadOnly}
-                expandToViewport={true}
-              />
-            </div>
+            <Box color="text-status-error">
+              <em>{isAdmin() ? 'Add options →' : 'No options configured'}</em>
+            </Box>
           );
+        }
+        return (
+          <Select
+            selectedOption={value ? { label: value, value } : null}
+            onChange={({ detail }) =>
+              handleUpdateVariableValue(
+                key,
+                detail.selectedOption?.value || ''
+              )
+            }
+            options={options.map((opt) => ({ label: opt, value: opt }))}
+            placeholder="Select a value"
+            disabled={isReadOnly}
+            expandToViewport={true}
+          />
+        );
+      }
 
       case 'text':
       default:
         return (
           <Input
             value={value}
-            onChange={({ detail }) => handleUpdateVariableValue(key, detail.value)}
+            onChange={({ detail }) =>
+              handleUpdateVariableValue(key, detail.value)
+            }
             placeholder="Variable value"
             readOnly={isReadOnly}
           />
@@ -185,56 +239,69 @@ export function VariablesSection({
     {
       id: 'key',
       header: 'Variable Name',
-      cell: (item: { key: string; value: string; schema: { type: SchemaType; options?: string[] } }) => item.key,
+      cell: (item: VariableItem) => item.key,
     },
     // Schema column - only visible to admins
-    ...(isAdmin() ? [{
-      id: 'schema',
-      header: 'Schema',
-      width: 200,
-      cell: (item: { key: string; value: string; schema: { type: SchemaType; options?: string[] } }) => (
-        <SpaceBetween direction="horizontal" size="xs">
-          <div style={{ position: 'relative', zIndex: 1000 }}>
-            <Select
-              selectedOption={schemaTypeOptions.find(opt => opt.value === item.schema.type) || schemaTypeOptions[0]}
-              onChange={({ detail }) =>
-                handleSchemaTypeChange(item.key, detail.selectedOption.value as SchemaType)
-              }
-              options={schemaTypeOptions}
-              disabled={isReadOnly}
-              expandToViewport={true}
-            />
-          </div>
-          {item.schema.type === 'select' && (
-            <Button
-              variant="inline-link"
-              onClick={() => setOptionsModalKey(item.key)}
-              disabled={isReadOnly}
-            >
-              Options ({item.schema.options?.length || 0})
-            </Button>
-          )}
-        </SpaceBetween>
-      ),
-    }] : []),
+    ...(isAdmin()
+      ? [
+          {
+            id: 'schema',
+            header: 'Schema',
+            cell: (item: VariableItem) => (
+              <SpaceBetween direction="horizontal" size="xs" alignItems="center">
+                <div style={{ width: '120px' }}>
+                  <Select
+                    selectedOption={
+                      schemaTypeOptions.find(
+                        (opt) => opt.value === item.schema.type
+                      ) || schemaTypeOptions[0]
+                    }
+                    onChange={({ detail }) =>
+                      handleSchemaTypeChange(
+                        item.key,
+                        detail.selectedOption.value as SchemaType
+                      )
+                    }
+                    options={schemaTypeOptions}
+                    disabled={isReadOnly}
+                    expandToViewport={true}
+                  />
+                </div>
+                {item.schema.type === 'select' && (
+                  <Button
+                    variant="inline-link"
+                    onClick={() => setOptionsModalKey(item.key)}
+                    disabled={isReadOnly}
+                  >
+                    Options ({item.schema.options?.length || 0})
+                  </Button>
+                )}
+              </SpaceBetween>
+            ),
+          },
+        ]
+      : []),
     {
       id: 'value',
       header: 'Value',
-      cell: (item: { key: string; value: string; schema: { type: SchemaType; options?: string[] } }) =>
-        renderValueControl(item),
+      cell: (item: VariableItem) => renderValueControl(item),
     },
-    ...(canAddVariables ? [{
-      id: 'actions',
-      header: 'Actions',
-      cell: (item: { key: string; value: string; schema: { type: SchemaType; options?: string[] } }) => (
-        <Button
-          variant="icon"
-          iconName="remove"
-          onClick={() => handleRemoveVariable(item.key)}
-          ariaLabel={`Remove variable ${item.key}`}
-        />
-      ),
-    }] : []),
+    ...(canAddVariables
+      ? [
+          {
+            id: 'actions',
+            header: 'Actions',
+            cell: (item: VariableItem) => (
+              <Button
+                variant="icon"
+                iconName="remove"
+                onClick={() => handleRemoveVariable(item.key)}
+                ariaLabel={`Remove variable ${item.key}`}
+              />
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -274,9 +341,49 @@ export function VariablesSection({
           variableName={optionsModalKey}
           currentOptions={flowConfig.schema?.[optionsModalKey]?.options || []}
           onDismiss={() => setOptionsModalKey(null)}
-          onSave={(options: string[]) => handleOptionsChange(optionsModalKey, options)}
+          onSave={(options: string[]) =>
+            handleOptionsChange(optionsModalKey, options)
+          }
         />
+      )}
+
+      {/* Type Change Confirmation Modal */}
+      {typeChangeConfirmation && (
+        <Modal
+          visible={!!typeChangeConfirmation}
+          onDismiss={() => setTypeChangeConfirmation(null)}
+          header="Change Variable Type?"
+          footer={
+            <Box float="right">
+              <SpaceBetween direction="horizontal" size="xs">
+                <Button variant="link" onClick={() => setTypeChangeConfirmation(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    performSchemaTypeChange(typeChangeConfirmation.key, typeChangeConfirmation.newType);
+                    setTypeChangeConfirmation(null);
+                  }}
+                >
+                  Change Type
+                </Button>
+              </SpaceBetween>
+            </Box>
+          }
+        >
+          <SpaceBetween direction="vertical" size="m">
+            <Box>
+              Changing from <strong>Select</strong> to <strong>{typeChangeConfirmation.newType}</strong> will permanently delete the configured options.
+            </Box>
+            <Box color="text-status-warning">
+              This action cannot be undone.
+            </Box>
+          </SpaceBetween>
+        </Modal>
       )}
     </>
   );
 }
+
+
