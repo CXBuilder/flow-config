@@ -48,7 +48,6 @@
     "clean": "rimraf dist",
     "stage": "cdk-assets -v -p ./cdk.out/East.assets.json publish && cdk-assets -v -p ./cdk.out/West.assets.json publish",
     "synth": "npm run cdk -- synth --quiet",
-    "synth2": "npm run synth -- -c stage=ccaastest",
     "diff": "npm run cdk -- diff",
     "deploy": "npm run cdk -- deploy --all --require-approval never",
     "start": "npm start --prefix frontend",

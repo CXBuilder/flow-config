@@ -3984,7 +3984,7 @@
   },
   "name": "@cxbuilder/flow-config",
   "readme": {
-    "markdown": "# @cxbuilder/flow-config\n\n[![CI/CD Pipeline](https://github.com/cxbuilder/flow-config/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/cxbuilder/flow-config/actions/workflows/ci-cd.yml)\n[![npm version](https://badge.fury.io/js/@cxbuilder%2Fflow-config.svg)](https://badge.fury.io/js/@cxbuilder%2Fflow-config)\n[![PyPI version](https://badge.fury.io/py/cxbuilder-flow-config.svg)](https://badge.fury.io/py/cxbuilder-flow-config)\n[![View on Construct Hub](https://constructs.dev/badge?package=%40cxbuilder%2Fflow-config)](https://constructs.dev/packages/@cxbuilder/flow-config)\n\nAWS CDK constructs for Amazon Connect FlowConfig - a third-party app for configuring variables and prompts in Connect contact flows.\n\n## Links\n\n- [Screenshots](./docs/screenshots/)\n- [Architecture](./docs/Architecture.md)\n- [DataModel](./docs/DataModel.md)\n\n## Installation\n\n```bash\nnpm install @cxbuilder/flow-config\n```\n\n## Usage\n\n### Standard Deployment (Public)\n\n```typescript\nimport { FlowConfigStack } from '@cxbuilder/flow-config';\nimport * as cdk from 'aws-cdk-lib';\n\nconst app = new cdk.App();\nnew FlowConfigStack(app, 'FlowConfigStack', {\n  prefix: 'my-flow-config',\n  env: {\n    region: 'us-east-1',\n    account: 'YOUR_ACCOUNT_ID',\n  },\n  cognito: {\n    domain: 'https://your-auth-domain.com',\n    userPoolId: 'us-east-1_YourPoolId',\n  },\n  connectInstanceArn:\n    'arn:aws:connect:us-east-1:YOUR_ACCOUNT:instance/YOUR_INSTANCE_ID',\n  alertEmails: ['admin@yourcompany.com'],\n});\n```\n\n### VPC Private Deployment\n\nFor enhanced security, you can deploy the application to run entirely within a VPC with private endpoints:\n\n```typescript\nimport { FlowConfigStack, VpcConfig } from '@cxbuilder/flow-config';\nimport * as cdk from 'aws-cdk-lib';\n\nconst app = new cdk.App();\n\n// Configure VPC using string IDs - the stack will resolve these to CDK objects\nconst vpcConfig: VpcConfig = {\n  vpcId: 'vpc-12345678',\n  lambdaSecurityGroupIds: ['sg-lambda123'],\n  privateSubnetIds: ['subnet-12345', 'subnet-67890'],\n  vpcEndpointSecurityGroupIds: ['sg-endpoint123'],\n};\n\nnew FlowConfigStack(app, 'FlowConfigStack', {\n  prefix: 'my-flow-config',\n  env: {\n    region: 'us-east-1',\n    account: 'YOUR_ACCOUNT_ID',\n  },\n  cognito: {\n    domain: 'https://your-auth-domain.com',\n    userPoolId: 'us-east-1_YourPoolId',\n  },\n  connectInstanceArn:\n    'arn:aws:connect:us-east-1:YOUR_ACCOUNT:instance/YOUR_INSTANCE_ID',\n  alertEmails: ['admin@yourcompany.com'],\n  vpc: vpcConfig, // Enable VPC private deployment\n});\n```\n\n### Multi-Region Global Table Deployment\n\nFor global resilience, deploy the application across multiple regions with DynamoDB Global Tables:\n\n#### Primary Region Setup\n\n```typescript\nimport { FlowConfigStack, GlobalTableConfig } from '@cxbuilder/flow-config';\nimport * as cdk from 'aws-cdk-lib';\n\nconst app = new cdk.App();\n\n// Primary region creates the global table with replicas\nconst primaryGlobalTable: GlobalTableConfig = {\n  isPrimaryRegion: true,\n  replicaRegions: ['us-west-2', 'eu-west-1'],\n};\n\nnew FlowConfigStack(app, 'FlowConfigStack-Primary', {\n  prefix: 'my-flow-config',\n  env: {\n    region: 'us-east-1',\n    account: 'YOUR_ACCOUNT_ID',\n  },\n  cognito: {\n    domain: 'https://your-auth-domain.com',\n    userPoolId: 'us-east-1_YourPoolId',\n  },\n  connectInstanceArn:\n    'arn:aws:connect:us-east-1:YOUR_ACCOUNT:instance/YOUR_INSTANCE_ID',\n  alertEmails: ['admin@yourcompany.com'],\n  globalTable: primaryGlobalTable, // Enable global table\n});\n```\n\n#### Secondary Region Setup\n\n```typescript\nnew FlowConfigStack(app, 'FlowConfigStack-Secondary', {\n  prefix: 'my-flow-config',\n  env: {\n    region: 'us-west-2',\n    account: 'YOUR_ACCOUNT_ID',\n  },\n  cognito: {\n    domain: 'https://your-auth-domain.com',\n    userPoolId: 'us-west-2_YourPoolId',\n  },\n  connectInstanceArn:\n    'arn:aws:connect:us-west-2:YOUR_ACCOUNT:instance/YOUR_INSTANCE_ID',\n  alertEmails: ['admin@yourcompany.com'],\n  globalTable: {\n    isPrimaryRegion: false, // Reference global table\n  },\n});\n```\n\n## Features\n\n- **Serverless Architecture**: Built with AWS Lambda, DynamoDB, and API Gateway\n- **Amazon Connect Integration**: GetConfig Lambda function integrated directly with Connect contact flows\n- **Third-Party App**: Web-based interface embedded in Amazon Connect Agent Workspace\n- **Multi-Language Support**: Configure prompts for different languages and channels (voice/chat)\n- **Real-time Preview**: Text-to-speech preview using Amazon Polly\n- **Secure Access**: Integration with Amazon Connect and AWS Verified Permissions\n- **Flexible Deployment Options**:\n  - **Single-Region**: Standard deployment with regional DynamoDB table\n  - **Multi-Region**: Global table support with automatic replication across regions\n  - **Public Deployment**: Standard internet-accessible API Gateway and Lambda functions\n  - **VPC Private Deployment**: Private API Gateway endpoints, VPC-enabled Lambda functions, and VPC endpoints for enhanced security\n\n## GetConfig Lambda Integration\n\nThe GetConfig Lambda function is used within contact flows to access your flow configs. This function is automatically integrated with your Amazon Connect instance during deployment.\n\n### Contact Flow Event Structure\n\nThe Lambda function handles Amazon Connect Contact Flow events with the following structure:\n\n```json\n{\n  \"Details\": {\n    \"Parameters\": {\n      \"id\": \"main-queue\",\n      \"lang\": \"es-US\"\n    },\n    \"ContactData\": {\n      \"Channel\": \"VOICE\",\n      \"LanguageCode\": \"en-US\"\n    }\n  }\n}\n```\n\n### Input Parameters and Priority\n\n1. **Required Parameters**:\n\n   - **`id`**: Flow configuration identifier (always required)\n     - Provided via `Details.Parameters.id`\n\n2. **Optional Language Selection** (in order of precedence):\n\n   - `Details.Parameters.lang` (highest priority)\n   - `Details.ContactData.LanguageCode`\n   - Defaults to `\"en-US\"`\n\n3. **Channel Detection**:\n   - Automatically read from `Details.ContactData.Channel`\n   - Supports `\"VOICE\"` and `\"CHAT\"`\n   - Defaults to `\"voice\"`\n\n### Alternative Input Format (Testing)\n\nFor direct testing or non-Connect invocation:\n\n```json\n{\n  \"id\": \"main-queue\",\n  \"lang\": \"es-US\",\n  \"channel\": \"voice\"\n}\n```\n\n### Function Behavior\n\n1. **Parameter Resolution**:\n\n   - Extracts `id` from Connect event parameters (required)\n   - Resolves language from parameters → attributes → default\n   - Determines channel from Contact Flow event data\n\n2. **Processing Steps**:\n\n   - Retrieves the flow config from DynamoDB using the provided ID\n   - Includes all variables from the flow config in the result\n   - For each prompt in the flow config:\n     - Selects the appropriate language version\n     - Uses voice content by default\n     - For chat channel:\n       - Uses chat-specific content if available\n       - Strips SSML tags from voice content if no chat content exists\n\n3. **Output**:\n   - Returns a flattened object containing:\n     - All variable key-value pairs from the flow config\n     - All prompt values resolved for the specified language and channel\n\n### Setting Up in Contact Flow\n\n1. **Add \"Invoke AWS Lambda function\" block** to your contact flow\n2. **Select the GetConfig Lambda function** (deployed as `${prefix}`)\n3. **Configure parameters**:\n\n```json\n{\n  \"id\": \"main-queue\"\n}\n```\n\nOr with explicit language:\n\n```json\n{\n  \"id\": \"main-queue\",\n  \"lang\": \"es-US\"\n}\n```\n\n### Using Returned Data\n\nThe Lambda response is automatically available in subsequent blocks:\n\n- **Set contact attributes**: Use `$.External.variableName`\n- **Play prompt**: Use `$.External.promptName`\n- **Check contact attributes**: Reference returned variables for routing decisions\n\n### Example Contact Flow Integration\n\n```\n[Get customer input] → [Invoke Lambda: GetConfig]\n                           ↓\n                      [Set contact attributes]\n                           ↓\n                      [Play prompt: $.External.welcomeMessage]\n                           ↓\n                      [Route based on: $.External.routingMode]\n```\n\n### Size Considerations\n\n- Amazon Connect has a Lambda response size limit of 32KB\n- The combined size of returned variables and prompts should be less than this limit\n- For large flow configs with many prompts or languages, consider implementing pagination or selective loading\n\n### Logger\n\n[Lambda PowerTools Logger](https://docs.powertools.aws.dev/lambda/typescript/latest/core/logger/) provides a lightweight logger implementation with JSON output.\n\nTips:\n\n- Use the `appendKeys()` method to add `ContactId` to your connect log lambda output.\n\n### Open API Spec\n\nThis template defines an Open API Spec for the API GW Lambdas. This allows use to generate a TypeScript api client to be used by the frontend app. We can also generate a API client in any language from the same spec to allow the client to better integrate with our apps.\n\n- [constructs/aws-openapigateway-lambda](https://docs.aws.amazon.com/solutions/latest/constructs/aws-openapigateway-lambda.html)\n- [OpenAPI Editor](https://marketplace.visualstudio.com/items?itemName=42Crunch.vscode-openapi)\n- [OpenApy TypeScript Generator](https://openapi-ts.pages.dev/introduction)\n\n## Development\n\n### Frontend Development\n\nThe frontend React application integrates with Amazon Connect Agent Workspace using the Connect SDK:\n\n```bash\n# Start local development server\nnpm start\n\n# Build for production\nnpm run build\n```\n\nFor local development, point your Amazon Connect third-party app configuration to `localhost:3000`. The application requires execution within Agent Workspace for Connect SDK functionality.\n\n### Lambda Development\n\nLambda functions are bundled automatically during the build process:\n\n```bash\n# Bundle Lambda functions\nnpm run build:lambdas\n\n# Full build (CDK + Frontend + Lambdas)\nnpm run build\n```\n"
+    "markdown": "# FlowConfig for Amazon Connect\n\n[![CI/CD Pipeline](https://github.com/cxbuilder/flow-config/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/cxbuilder/flow-config/actions/workflows/ci-cd.yml)\n[![npm version](https://badge.fury.io/js/@cxbuilder%2Fflow-config.svg)](https://badge.fury.io/js/@cxbuilder%2Fflow-config)\n[![PyPI version](https://badge.fury.io/py/cxbuilder-flow-config.svg)](https://badge.fury.io/py/cxbuilder-flow-config)\n[![View on Construct Hub](https://constructs.dev/badge?package=%40cxbuilder%2Fflow-config)](https://constructs.dev/packages/@cxbuilder/flow-config)\n\n**Empower your business users to manage Amazon Connect contact flow configurations without IT involvement.**\n\nFlowConfig is a third-party app for Amazon Connect that lets business users update customer messages, queue settings, and routing variables in real-time—without touching contact flows or deploying code.\n\n![FlowConfig Admin View](./docs/screenshots/landing-admin.png)\n\n## The Problem\n\nYour contact center needs to respond quickly to changing conditions:\n\n- 🚨 **Emergency closures** require immediate routing changes\n- 🗓️ **Seasonal hours** need frequent prompt updates\n- 🌍 **Multi-language support** means managing dozens of message variants\n- 🏢 **Multiple locations** each need custom greetings and settings\n- ⏱️ **Queue thresholds** must adapt to call volume fluctuations\n\nBut every change requires:\n- Opening Amazon Connect contact flow designer\n- Finding and updating multiple text blocks\n- Testing changes\n- Deploying updates\n- Waiting for IT availability\n\n**There has to be a better way.**\n\n## The Solution\n\nFlowConfig separates **configuration** from **logic**. Your contact flow designers build reusable flows once, and business users manage the values that drive them.\n\n### What You Can Configure\n\n**Variables** - Settings that control contact flow behavior:\n- Boolean flags: `closure`, `offerCallback`, `holidayMode`\n- Numbers: `maxWaitTime`, `queueDepth`, `transferTimeout`\n- Text values: `skillLevel`, `routingMode`, `priority`\n\n**Prompts** - Customer-facing messages:\n- Multi-language support (English, Spanish, French, etc.)\n- Separate voice and chat content\n- Text-to-speech preview before going live\n\n### Who Uses FlowConfig\n\n**👔 Edit Users**\n- Update all variables and prompts across all flow configurations\n- Change settings during high-volume events or emergencies\n- Update prompts for holidays, closures, and special events\n- Preview voice messages before customers hear them\n- Make changes instantly without IT involvement\n\n**🔧 Administrators (Admin Access)**\n- Create and organize flow configurations\n- Define variable schema types (Text, Number, Boolean, Select)\n- Add/remove variables and prompts\n- Set up multi-language prompts for global operations\n- Import/export configurations across environments\n- Configure application settings (available locales and voices)\n\n**👀 Read-Only Users**\n- View all configurations and settings\n- Monitor what messages customers are currently hearing\n- Review variable values without editing capability\n\n## Quick Links\n\n### 📘 I'm a Business User\n- [Edit User Guide](./docs/UserGuide-Edit.md) - Learn how to update variables and prompts\n- [Administrator Guide](./docs/UserGuide-Admin.md) - Create and manage configurations\n- [Read-Only User Guide](./docs/UserGuide-Read.md) - View configurations\n\n### 🛠️ I'm a Developer/Architect\n- [Installation & Deployment](./docs/Installation.md) - Get started deploying FlowConfig\n- [Architecture](./docs/Architecture.md) - Understand the technical design\n- [Data Model](./docs/DataModel.md) - Explore the data structure\n\n### 🎯 I'm Evaluating This Solution\n- [Screenshots](./docs/screenshots/) - See the interface in action\n- [Use Cases](#common-use-cases) - Real-world scenarios below\n- [Features](#key-features) - What's included\n\n## Common Use Cases\n\n### 🏢 Multi-Branch Operations\n\n**Challenge**: 50 branch offices, each with unique phone numbers and custom greetings, but sharing the same contact flow logic.\n\n**Solution**: Create one flow configuration per branch (e.g., `branch-office-austin`, `branch-office-seattle`). Each branch gets custom prompts and settings while using a single, centralized contact flow design.\n\n**Result**: Onboard new branches in minutes. Local staff can update their own greetings and settings without IT involvement.\n\n---\n\n### 🚨 Emergency Response\n\n**Challenge**: Fire alarm requires immediate call center closure. Every minute of delay means confused customers and wasted agent time.\n\n**Solution**: Business users open FlowConfig, toggle `closure: true`, and save. All new calls immediately hear the closure message and are routed appropriately.\n\n**Result**: Response time measured in seconds, not hours. No contact flow changes, no deployments, no IT tickets.\n\n---\n\n### 🌍 Global Customer Support\n\n**Challenge**: Supporting customers in English, Spanish, and French requires managing hundreds of prompt variants across dozens of contact flows.\n\n**Solution**: Define prompts once in FlowConfig with all language variants. Contact flows automatically select the correct language based on customer preference.\n\n**Result**: Add a new language by updating prompts in FlowConfig—no contact flow changes required.\n\n---\n\n### 📊 Dynamic Queue Management\n\n**Challenge**: Call volume spikes require rapid adjustment of queue thresholds, wait times, and callback offerings.\n\n**Solution**: Business users adjust variables like `maxQueueDepth`, `maxWaitTime`, and `offerCallback` in real-time based on current conditions.\n\n**Result**: Contact center supervisors respond to changing conditions without waiting for IT or risking contact flow mistakes.\n\n---\n\n## Key Features\n\n**For Business Users:**\n- ✅ **No-Code Interface** - Simple web UI embedded in Amazon Connect Agent Workspace\n- 🎧 **Preview Before Publishing** - Hear exactly how prompts will sound using Amazon Polly text-to-speech\n- 🌍 **Multi-Language Support** - Manage prompts in multiple languages with separate voice and chat content\n- ⚡ **Instant Updates** - Changes take effect immediately for new customer contacts\n- 🔒 **Role-Based Access** - Three access levels: Admin, Edit, and Read-Only\n\n**For IT Teams:**\n- 🏗️ **Serverless Architecture** - Built on AWS Lambda, DynamoDB, and API Gateway\n- 🔌 **Native Connect Integration** - Seamlessly integrates with contact flows via Lambda function\n- 🔐 **Secure by Design** - AWS Cognito authentication with role-based access control\n- 📦 **Easy Deployment** - Single CDK construct deploys the entire stack\n- 🌐 **Flexible Architecture** - Supports single-region, multi-region, public, or VPC-private deployments\n- 📤 **Import/Export** - Move configurations between environments (dev/test/prod)\n\n---\n\n## Getting Started\n\n### For Developers\n\n**Installation:**\n\n```bash\nnpm install @cxbuilder/flow-config\n```\n\n**Basic Usage:**\n\n```typescript\nimport { FlowConfigStack } from '@cxbuilder/flow-config';\nimport * as cdk from 'aws-cdk-lib';\n\nconst app = new cdk.App();\nnew FlowConfigStack(app, 'FlowConfigStack', {\n  prefix: 'my-flow-config',\n  env: { region: 'us-east-1', account: 'YOUR_ACCOUNT_ID' },\n  cognito: {\n    domain: 'https://your-auth-domain.com',\n    userPoolId: 'us-east-1_YourPoolId',\n  },\n  connectInstanceArn: 'arn:aws:connect:us-east-1:YOUR_ACCOUNT:instance/YOUR_INSTANCE_ID',\n  alertEmails: ['admin@yourcompany.com'],\n});\n```\n\n**Next Steps:**\n- See the [Installation Guide](./docs/Installation.md) for detailed deployment instructions\n- Review the [Architecture](./docs/Architecture.md) to understand the technical design\n- Explore advanced configurations (VPC private, multi-region, etc.)\n\n### For Contact Flow Designers\n\n**Using FlowConfig in Your Contact Flows:**\n\n1. Add an \"Invoke AWS Lambda function\" block\n2. Select the GetConfig Lambda function (automatically deployed)\n3. Pass the configuration ID as a parameter:\n\n```json\n{\n  \"id\": \"main-queue\"\n}\n```\n\n4. Use the returned values in subsequent blocks:\n   - Variables: `$.External.closure`, `$.External.maxWaitTime`\n   - Prompts: `$.External.welcome`, `$.External.holdMessage`\n\n**Example Flow:**\n\n```\n[Entry Point] → [Invoke Lambda: GetConfig with id=\"main-queue\"]\n                      ↓\n                [Check: $.External.closure = true?]\n                      ↓                    ↓\n                  [Yes: Play           [No: Continue\n                   $.External.          to queue]\n                   closureMessage]\n```\n\nFor detailed Lambda integration instructions, see the [Technical Reference](#technical-reference) below.\n\n---\n\n## Technical Reference\n\n### GetConfig Lambda Integration\n\nThe GetConfig Lambda function is used within contact flows to access your flow configs. This function is automatically integrated with your Amazon Connect instance during deployment.\n\n**Lambda Parameters:**\n\n- **Required**: `id` - The flow configuration identifier\n- **Optional**: `lang` - Language code (defaults to contact's language or `en-US`)\n- **Auto-detected**: `channel` - Voice or chat (detected from contact data)\n\n**Lambda Response:**\n\nReturns a flattened object containing all variables and prompts from the configuration:\n\n```json\n{\n  \"closure\": \"false\",\n  \"maxWaitTime\": \"600\",\n  \"offerCallback\": \"true\",\n  \"welcome\": \"Thank you for calling...\",\n  \"holdMessage\": \"Please continue to hold...\"\n}\n```\n\n**Key Behaviors:**\n\n- Automatically selects the correct language variant based on customer preference\n- Returns chat-specific content for chat contacts (or strips SSML from voice content)\n- Includes all variables as key-value pairs\n- 32KB response size limit (Amazon Connect restriction)\n\n**Detailed Documentation:**\n\nFor complete API documentation, event structures, and advanced usage, see:\n- [Architecture Documentation](./docs/Architecture.md) - Full Lambda integration details\n- [Data Model](./docs/DataModel.md) - Configuration structure and schemas\n\n---\n\n## Development\n\nFor developers contributing to FlowConfig or customizing the deployment:\n\n**Frontend Development:**\n\n```bash\nnpm start              # Local dev server\nnpm run build          # Production build\n```\n\n**Lambda Development:**\n\n```bash\nnpm run build:lambdas  # Bundle Lambda functions\nnpm run build          # Full build (CDK + Frontend + Lambdas)\n```\n\n**Additional Resources:**\n- Uses [Lambda PowerTools](https://docs.powertools.aws.dev/lambda/typescript/latest/) for logging\n- OpenAPI spec for API Gateway enables client generation in any language\n- Frontend built with React and Amazon CloudScape Design System\n\nFor detailed development setup, see [Installation Guide](./docs/Installation.md).\n"
   },
   "repository": {
     "type": "git",
@@ -4135,7 +4135,7 @@
         },
         "locationInModule": {
           "filename": "infrastructure/FlowConfigStack.ts",
-          "line": 169
+          "line": 176
         },
         "parameters": [
           {
@@ -4161,7 +4161,7 @@
       "kind": "class",
       "locationInModule": {
         "filename": "infrastructure/FlowConfigStack.ts",
-        "line": 145
+        "line": 152
       },
       "methods": [
         {
@@ -4171,7 +4171,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 295
+            "line": 314
           },
           "name": "associate3pApp"
         },
@@ -4181,7 +4181,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 235
+            "line": 244
           },
           "name": "createUserPoolClient",
           "returns": {
@@ -4197,7 +4197,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 263
+            "line": 278
           },
           "name": "createUserPoolGroups"
         }
@@ -4211,7 +4211,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 165
+            "line": 172
           },
           "name": "appUrl",
           "type": {
@@ -4224,7 +4224,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 149
+            "line": 156
           },
           "name": "alertTopic",
           "type": {
@@ -4237,7 +4237,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 172
+            "line": 179
           },
           "name": "props",
           "type": {
@@ -4250,7 +4250,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 150
+            "line": 157
           },
           "name": "table",
           "type": {
@@ -4263,7 +4263,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 146
+            "line": 153
           },
           "name": "userPool",
           "optional": true,
@@ -4277,7 +4277,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 148
+            "line": 155
           },
           "name": "userPoolClient",
           "optional": true,
@@ -4387,7 +4387,7 @@
           "immutable": true,
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 142
+            "line": 149
           },
           "name": "associate3pApp",
           "optional": true,
@@ -4659,6 +4659,6 @@
       "symbolId": "infrastructure/FlowConfigStack:LambdaVpcConfig"
     }
   },
-  "version": "2.2.0",
-  "fingerprint": "d5aIsBN6EfatPj+RWSwX3bJfoNsKhnBmCQxlGHI0RdU="
+  "version": "2.3.0",
+  "fingerprint": "ROnEb9rIaSYmAHh3KF1McDzBY027bfRm/mlnurq4rkU="
 }
