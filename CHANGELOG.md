@@ -1,31 +1,41 @@
-# Changelog
+# Change Log
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.0] - 2025-12-02
+## 2.2.1 (2025-12-16)
 
-- Admins can control the variable type
-- Added role based user guides
+- ivan.bliskavka
+  - CICD: Automatically create GitHub releases
 
-## [2.1.1] - 2025-10-08
+## 2.2.0 (2025-12-02)
 
-- Fixed `associate3pApp` prop reference in `associate3pApp()` method to properly read from props
-- Added Unit tests for FlowConfigStack to verify `associate3pApp` configuration behavior
+- sebastian.russo
+  - Admins can control the variable type
+- ivan.bliskavka
+  - Added role based user guides
 
-## [2.1.0] - 2025-10-08
+## 2.1.1 (2025-10-08)
 
-- Added `associate3pApp` stack prop which allow you turn off the automatic Agent Workspace app association
+- ivan.bliskavka
+  - Fixed `associate3pApp` prop reference in `associate3pApp()` method to properly read from props
+  - Added Unit tests for FlowConfigStack to verify `associate3pApp` configuration behavior
 
-## [2.0.0] - 2025-07-30
+## 2.1.0 (2025-10-08)
 
-- Add an admin page where users can select available locale an available voice ids.
-- Add ability to import/export configs
-- Fix Private API GW URL
-- Sort flows/prompts/variables by name
-- Add ability to remove CXBuilder branding from frontend
+- ivan.bliskavka
+  - Added `associate3pApp` stack prop which allow you turn off the automatic Agent Workspace app association
+
+## 2.0.0 (2025-07-30)
+
+- ivan.bliskavka
+  - Add an admin page where users can select available locale an available voice ids.
+  - Add ability to import/export configs
+  - Fix Private API GW URL
+  - Sort flows/prompts/variables by name
+  - Add ability to remove CXBuilder branding from frontend
 
 ### v2.0.0 Breaking Changes
 
@@ -39,48 +49,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Split VPC configuration parameters into: `apiVpcConfig` and `lambdaVpcConfig`
   - Mitigation: migrate to the new props
 
-## [1.1.0] - 2025-06-23
+## 1.1.0 (2025-06-23)
 
-### Added
+- ivan.bliskavka
+  - Role-based access control (RBAC) using Amazon Cognito User Groups
+  - Three permission levels: FlowConfigAdmin, FlowConfigEdit, and FlowConfigRead
+  - Backend permission validation for all API endpoints
+  - Frontend UI adapts based on user permissions
+  - Read-only mode for users without edit access
+  - Access denied screen for users without any FlowConfig permissions
+  - Replaced placeholder permission system with full Cognito Groups implementation
+  - FlowConfigEdit users can add languages to prompts but cannot remove existing ones
+  - FlowConfigEdit users can add/remove channels but cannot modify structure
+  - Preview functionality remains available to all permission levels
 
-- Role-based access control (RBAC) using Amazon Cognito User Groups
-- Three permission levels: FlowConfigAdmin, FlowConfigEdit, and FlowConfigRead
-- Backend permission validation for all API endpoints
-- Frontend UI adapts based on user permissions
-- Read-only mode for users without edit access
-- Access denied screen for users without any FlowConfig permissions
+## 1.0.2 (2025-06-20)
 
-### Changed
+- ivan.bliskavka
+  - Converted to `SpecRestApi` because `@aws-solutions-constructs/aws-openapigateway-lambda` is not compatible with `Role.customizeRoles`
 
-- Replaced placeholder permission system with full Cognito Groups implementation
-- FlowConfigEdit users can add languages to prompts but cannot remove existing ones
-- FlowConfigEdit users can add/remove channels but cannot modify structure
-- Preview functionality remains available to all permission levels
+## 1.0.0 (2025-06-18)
 
-## [1.0.2] - 2025-06-20
-
-- Converted to `SpecRestApi` because `@aws-solutions-constructs/aws-openapigateway-lambda` is not compatible with `Role.customizeRoles`
-
-## [1.0.0] - 2025-06-18
-
-### Added
-
-- Initial NPM package release of @cxbuilder/flow-config
-- AWS CDK constructs for Amazon Connect FlowConfig infrastructure
-- InfrastructureStack for deploying serverless architecture
-- Lambda functions for CRUD operations on flow configurations
-- DynamoDB integration for configuration storage
-- API Gateway with OpenAPI specification
-- VPC endpoints for secure access
-- Integration with Amazon Polly for text-to-speech preview
-- React frontend with CloudScape Design System
-- TypeScript definitions and API models
-- Comprehensive documentation and examples
-
-### Features
-
-- Serverless architecture with AWS Lambda and DynamoDB
-- Multi-language prompt support
-- Real-time speech preview functionality
-- Secure authentication with Amazon Connect and Cognito
-- Variable and prompt management interface
+- ivan.bliskavka
+  - Initial NPM package release of @cxbuilder/flow-config
+  - AWS CDK constructs for Amazon Connect FlowConfig infrastructure
+  - InfrastructureStack for deploying serverless architecture
+  - Lambda functions for CRUD operations on flow configurations
+  - DynamoDB integration for configuration storage
+  - API Gateway with OpenAPI specification
+  - VPC endpoints for secure access
+  - Integration with Amazon Polly for text-to-speech preview
+  - React frontend with CloudScape Design System
+  - TypeScript definitions and API models
+  - Comprehensive documentation and examples
+  - Serverless architecture with AWS Lambda and DynamoDB
+  - Multi-language prompt support
+  - Real-time speech preview functionality
+  - Secure authentication with Amazon Connect and Cognito
+  - Variable and prompt management interface
