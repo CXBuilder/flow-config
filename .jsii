@@ -9,15 +9,15 @@
     "url": "https://www.cxbuilder.ai"
   },
   "bundled": {
-    "@aws-sdk/client-cloudformation": "^3.826.0",
-    "@aws-sdk/client-connect": "^3.826.0",
-    "@aws-sdk/client-dynamodb": "^3.826.0",
-    "@aws-sdk/client-lambda": "^3.826.0",
-    "@aws-sdk/client-polly": "^3.826.0",
-    "@aws-sdk/client-sns": "^3.826.0",
-    "@aws-sdk/lib-dynamodb": "^3.826.0",
+    "@aws-sdk/client-cloudformation": "^3.962.0",
+    "@aws-sdk/client-connect": "^3.962.0",
+    "@aws-sdk/client-dynamodb": "^3.962.0",
+    "@aws-sdk/client-lambda": "^3.962.0",
+    "@aws-sdk/client-polly": "^3.962.0",
+    "@aws-sdk/client-sns": "^3.962.0",
+    "@aws-sdk/lib-dynamodb": "^3.962.0",
     "mime-types": "^2.1.35",
-    "yaml": "^2.8.0"
+    "yaml": "^2.8.2"
   },
   "dependencies": {
     "aws-cdk-lib": "2.233.0",
@@ -8453,7 +8453,7 @@
     "stability": "stable"
   },
   "homepage": "https://github.com/cxbuilder/flow-config#readme",
-  "jsiiVersion": "5.8.12",
+  "jsiiVersion": "5.9.22",
   "keywords": [
     "aws",
     "cdk",
@@ -9103,6 +9103,6 @@
       "symbolId": "infrastructure/FlowConfigStack:LambdaVpcConfig"
     }
   },
-  "version": "2.2.2",
-  "fingerprint": "jKSDGcd+EN2fOKFWqbndB0oMyGWt3JzWnuG9sv7DWt4="
+  "version": "2.2.3",
+  "fingerprint": "M3UYVJLKiRmAA1Gd5XkHYVDZXrICXtoyUrx+xL8SAxo="
 }
