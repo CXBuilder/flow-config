@@ -75,6 +75,15 @@ export function createLambda<TEnv>(
   const stack = Stack.of(scope) as FlowConfigStack;
   const vpcConfig = stack._getResolvedVpcConfig();
 
+  // Create the log group BEFORE the function so CloudFormation establishes the dependency
+  // correctly. If the log group is created after using func.functionName, Lambda may
+  // auto-create the log group on first invocation before CloudFormation gets to it,
+  // causing a "already exists" failure during stack creation.
+  const logGroup = new LogGroup(scope, `${id}LogGroup`, {
+    retention: props.logRetention ?? RetentionDays.ONE_MONTH,
+    removalPolicy: RemovalPolicy.DESTROY,
+  });
+
   const func = new Function(scope, `${id}Function`, {
     // Apply defaults
     handler: 'index.handler',
@@ -100,6 +109,8 @@ export function createLambda<TEnv>(
     ...props,
     // Ensure that the log retention custom resource is not created
     logRetention: undefined,
+    // Use our managed log group (must come after spread to override any logGroup in props)
+    logGroup,
     environment: {
       // see https://docs.aws.amazon.com/lambda/latest/dg/typescript-exceptions.html
       NODE_OPTIONS: '--enable-source-maps',
@@ -114,8 +125,6 @@ export function createLambda<TEnv>(
 
   props.alertTopic?.grantPublish(func);
 
-  // Note: we are using this policy instead of log.grantWrite(func) because the func.functionName a circular dependency.
-  // To constrain LogGroup permissions further, you can use a static functionName with log.grantWrite
   func.role?.addManagedPolicy(
     ManagedPolicy.fromAwsManagedPolicyName(
       vpcConfig
@@ -124,11 +133,5 @@ export function createLambda<TEnv>(
     )
   );
 
-  // Create a self-managed log group
-  new LogGroup(scope, `${id}LogGroup`, {
-    retention: props.logRetention ?? RetentionDays.ONE_MONTH,
-    logGroupName: `/aws/lambda/${func.functionName}`,
-    removalPolicy: RemovalPolicy.DESTROY,
-  });
   return func;
 }
