@@ -9,18 +9,18 @@
     "url": "https://www.cxbuilder.ai"
   },
   "bundled": {
-    "@aws-sdk/client-cloudformation": "^3.962.0",
-    "@aws-sdk/client-connect": "^3.962.0",
-    "@aws-sdk/client-dynamodb": "^3.962.0",
-    "@aws-sdk/client-lambda": "^3.962.0",
-    "@aws-sdk/client-polly": "^3.962.0",
-    "@aws-sdk/client-sns": "^3.962.0",
-    "@aws-sdk/lib-dynamodb": "^3.962.0",
+    "@aws-sdk/client-cloudformation": "^3.1038.0",
+    "@aws-sdk/client-connect": "^3.1038.0",
+    "@aws-sdk/client-dynamodb": "^3.1038.0",
+    "@aws-sdk/client-lambda": "^3.1038.0",
+    "@aws-sdk/client-polly": "^3.1038.0",
+    "@aws-sdk/client-sns": "^3.1038.0",
+    "@aws-sdk/lib-dynamodb": "^3.1038.0",
     "mime-types": "^2.1.35",
-    "yaml": "^2.8.2"
+    "yaml": "^2.8.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.233.0",
+    "aws-cdk-lib": "^2.233.0",
     "constructs": "^10.0.0"
   },
   "dependencyClosure": {
@@ -9103,6 +9103,6 @@
       "symbolId": "infrastructure/FlowConfigStack:LambdaVpcConfig"
     }
   },
-  "version": "2.2.3",
-  "fingerprint": "rfXIe5MM5M0nwy9RPsiIR1uLJ4/3nlY153sGib6aAoI="
+  "version": "2.3.0",
+  "fingerprint": "8JuE4WlhpDSawezJVqoxpMuHUWonwR/E89M3+SnGRJA="
 }
