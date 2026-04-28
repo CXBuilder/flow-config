@@ -76,15 +76,6 @@ export function createLambda<TEnv>(
   const stack = Stack.of(scope) as FlowConfigStack;
   const vpcConfig = stack._getResolvedVpcConfig();
 
-  // Create the log group BEFORE the function so CloudFormation establishes the dependency
-  // correctly. If the log group is created after using func.functionName, Lambda may
-  // auto-create the log group on first invocation before CloudFormation gets to it,
-  // causing a "already exists" failure during stack creation.
-  const logGroup = new LogGroup(scope, `${id}LogGroup`, {
-    retention: RetentionDays.ONE_MONTH,
-    removalPolicy: RemovalPolicy.DESTROY,
-  });
-
   const func = new Function(scope, `${id}Function`, {
     // Apply defaults
     handler: 'index.handler',
@@ -108,8 +99,6 @@ export function createLambda<TEnv>(
     }),
     // Apply overrides
     ...props,
-    // Use our managed log group (must come after spread to override any logGroup in props)
-    logGroup,
     environment: {
       // see https://docs.aws.amazon.com/lambda/latest/dg/typescript-exceptions.html
       NODE_OPTIONS: '--enable-source-maps',
@@ -120,6 +109,12 @@ export function createLambda<TEnv>(
       ALERT_TOPIC_ARN: props.alertTopic?.topicArn ?? 'N/A',
       ...props.environment,
     },
+  });
+
+  new LogGroup(scope, `${id}LogGroup`, {
+    logGroupName: `/aws/lambda/${func.functionName}`,
+    retention: RetentionDays.ONE_MONTH,
+    removalPolicy: RemovalPolicy.DESTROY,
   });
 
   props.alertTopic?.grantPublish(func);

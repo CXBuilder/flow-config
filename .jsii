@@ -8660,7 +8660,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 295
+            "line": 300
           },
           "name": "associate3pApp"
         },
@@ -8670,7 +8670,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 235
+            "line": 240
           },
           "name": "createUserPoolClient",
           "returns": {
@@ -8686,7 +8686,7 @@
           },
           "locationInModule": {
             "filename": "infrastructure/FlowConfigStack.ts",
-            "line": 263
+            "line": 268
           },
           "name": "createUserPoolGroups"
         }
@@ -9104,5 +9104,5 @@
     }
   },
   "version": "2.3.0",
-  "fingerprint": "8JuE4WlhpDSawezJVqoxpMuHUWonwR/E89M3+SnGRJA="
+  "fingerprint": "x3PunOZLCyh7j+PP8XLsws4mii/dmHidxhAiTZSqUfg="
 }
