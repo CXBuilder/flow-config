@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.3.0 (2026-04-28)
+
+- ivan.bliskavka
+  - Refactored log group creation to use `func.functionName` (post-creation) to prevent "resource already exists" conflicts when `useCdkManagedLogGroup` is enabled
+  - Disabled `@aws-cdk/aws-lambda:useCdkManagedLogGroup` at stack context level to avoid double log group creation
+  - Removed manual `AWSLambdaBasicExecutionRole` / `AWSLambdaVPCAccessExecutionRole` policy attachment — CDK attaches these automatically
+  - Removed `logRetention` from `CreateLambdaProps` interface (was silently ignored)
+  - Added unit tests to confirm CDK auto-attaches correct execution role policies for VPC and non-VPC Lambdas
+  - Cleaned up synth-time warnings and updated dependencies
+
 ## 2.2.3 (2026-04-02)
 
 - jeff.modzel
