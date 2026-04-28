@@ -51,7 +51,8 @@
     "deploy": "npm run cdk -- deploy --all --require-approval never",
     "start": "npm start --prefix frontend",
     "schema": "openapi-typescript ./infrastructure/api/spec.yaml -o ./backend/shared/models/schema.ts",
-    "seed": "ts-node scripts/seed-dynamodb.ts"
+    "seed": "ts-node scripts/seed-dynamodb.ts",
+    "postinstall": "npm install --prefix frontend"
   },
   "devDependencies": {
     "@aws-lambda-powertools/logger": "^2.30.0",

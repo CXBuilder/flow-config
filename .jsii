@@ -8453,7 +8453,7 @@
     "stability": "stable"
   },
   "homepage": "https://github.com/cxbuilder/flow-config#readme",
-  "jsiiVersion": "5.9.22",
+  "jsiiVersion": "5.9.37",
   "keywords": [
     "aws",
     "cdk",
@@ -9104,5 +9104,5 @@
     }
   },
   "version": "2.2.3",
-  "fingerprint": "M3UYVJLKiRmAA1Gd5XkHYVDZXrICXtoyUrx+xL8SAxo="
+  "fingerprint": "rfXIe5MM5M0nwy9RPsiIR1uLJ4/3nlY153sGib6aAoI="
 }
