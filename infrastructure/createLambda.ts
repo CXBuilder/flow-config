@@ -1,5 +1,4 @@
 import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
-import { ManagedPolicy } from 'aws-cdk-lib/aws-iam';
 import {
   Architecture,
   Runtime,
@@ -16,8 +15,10 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { FlowConfigStack } from './FlowConfigStack';
 
-interface CreateLambdaProps<TEnv>
-  extends Omit<FunctionProps, 'handler' | 'environment' | 'code' | 'runtime'> {
+interface CreateLambdaProps<TEnv> extends Omit<
+  FunctionProps,
+  'handler' | 'environment' | 'code' | 'runtime' | 'logRetention'
+> {
   environment?: TEnv;
 
   /**
@@ -32,7 +33,7 @@ interface CreateLambdaProps<TEnv>
 export function createLambda<TEnv>(
   scope: Construct,
   id: string,
-  props: CreateLambdaProps<TEnv>
+  props: CreateLambdaProps<TEnv>,
 ) {
   // Determine the code location based on logical ID
   // If id is "Handler", use the parent construct's ID instead
@@ -53,16 +54,16 @@ export function createLambda<TEnv>(
           '..',
           'backend',
           backendId,
-          'index.js'
+          'index.js',
         )}. ` +
-          'Please run "npm run build:lambdas" to bundle the Lambda functions.'
+          'Please run "npm run build:lambdas" to bundle the Lambda functions.',
       );
     }
   }
 
-  console.log(
-    `📦 Using Lambda code for ${backendId} (id=${id}) from: ${codeLocation}`
-  );
+  // console.log(
+  //   `📦 Using Lambda code for ${backendId} (id=${id}) from: ${codeLocation}`,
+  // );
 
   // Get the current region for the Lambda Powertools layer
   const region = Stack.of(scope).region;
@@ -74,15 +75,6 @@ export function createLambda<TEnv>(
   // Check if we're in a FlowConfigStack and get VPC configuration
   const stack = Stack.of(scope) as FlowConfigStack;
   const vpcConfig = stack._getResolvedVpcConfig();
-
-  // Create the log group BEFORE the function so CloudFormation establishes the dependency
-  // correctly. If the log group is created after using func.functionName, Lambda may
-  // auto-create the log group on first invocation before CloudFormation gets to it,
-  // causing a "already exists" failure during stack creation.
-  const logGroup = new LogGroup(scope, `${id}LogGroup`, {
-    retention: props.logRetention ?? RetentionDays.ONE_MONTH,
-    removalPolicy: RemovalPolicy.DESTROY,
-  });
 
   const func = new Function(scope, `${id}Function`, {
     // Apply defaults
@@ -96,7 +88,7 @@ export function createLambda<TEnv>(
       LayerVersion.fromLayerVersionArn(
         scope,
         `${id}PowertoolsLayer`,
-        powertoolsLayerArn
+        powertoolsLayerArn,
       ),
     ],
     // VPC configuration if provided
@@ -107,10 +99,6 @@ export function createLambda<TEnv>(
     }),
     // Apply overrides
     ...props,
-    // Ensure that the log retention custom resource is not created
-    logRetention: undefined,
-    // Use our managed log group (must come after spread to override any logGroup in props)
-    logGroup,
     environment: {
       // see https://docs.aws.amazon.com/lambda/latest/dg/typescript-exceptions.html
       NODE_OPTIONS: '--enable-source-maps',
@@ -123,15 +111,13 @@ export function createLambda<TEnv>(
     },
   });
 
-  props.alertTopic?.grantPublish(func);
+  new LogGroup(scope, `${id}LogGroup`, {
+    logGroupName: `/aws/lambda/${func.functionName}`,
+    retention: RetentionDays.ONE_MONTH,
+    removalPolicy: RemovalPolicy.DESTROY,
+  });
 
-  func.role?.addManagedPolicy(
-    ManagedPolicy.fromAwsManagedPolicyName(
-      vpcConfig
-        ? 'service-role/AWSLambdaVPCAccessExecutionRole'
-        : 'service-role/AWSLambdaBasicExecutionRole'
-    )
-  );
+  props.alertTopic?.grantPublish(func);
 
   return func;
 }

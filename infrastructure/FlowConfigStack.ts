@@ -188,6 +188,11 @@ export class FlowConfigStack extends cdk.Stack {
       terminationProtection: prod,
     });
 
+    // createLambda explicitly manages log groups, so disable CDK's automatic
+    // log group creation to prevent "resource already exists" conflicts when
+    // the consuming app enables @aws-cdk/aws-lambda:useCdkManagedLogGroup.
+    this.node.setContext('@aws-cdk/aws-lambda:useCdkManagedLogGroup', false);
+
     // Resolve VPC configuration if provided
     this._resolvedVpcConfig = lambdaVpcConfig
       ? this.resolveVpcConfig(lambdaVpcConfig)
