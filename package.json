@@ -1,6 +1,6 @@
 {
   "name": "@cxbuilder/flow-config",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "license": "MIT",
   "description": "Amazon Connect third-party app for configuring variables and prompts in Connect contact flows",
   "author": {
@@ -52,7 +52,7 @@
     "start": "npm start --prefix frontend",
     "schema": "openapi-typescript ./infrastructure/api/spec.yaml -o ./backend/shared/models/schema.ts",
     "seed": "ts-node scripts/seed-dynamodb.ts",
-    "postinstall": "npm install --prefix frontend"
+    "prepare": "npm i --prefix frontend"
   },
   "devDependencies": {
     "@aws-lambda-powertools/logger": "^2.33.0",
