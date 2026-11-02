@@ -279,3 +279,7 @@ npm run build          # Full build (CDK + Frontend + Lambdas)
 - Frontend built with React and Amazon CloudScape Design System
 
 For detailed development setup, see [Installation Guide](./docs/Installation.md).
+
+## About
+
+Built and maintained by [CXBuilder](https://cxbuilder.ai), an AWS Advanced Tier partner that designs, builds and operates Amazon Connect contact centers on AWS.

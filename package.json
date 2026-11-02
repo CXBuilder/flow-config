@@ -1,13 +1,13 @@
 {
   "name": "@cxbuilder/flow-config",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "license": "MIT",
   "description": "Amazon Connect third-party app for configuring variables and prompts in Connect contact flows",
   "author": {
     "name": "CXBuilder",
     "email": "ivan@cxbuilder.ai",
     "organization": true,
-    "url": "https://www.cxbuilder.ai"
+    "url": "https://cxbuilder.ai"
   },
   "repository": {
     "type": "git",
@@ -125,7 +125,7 @@
   "bugs": {
     "url": "https://github.com/cxbuilder/flow-config/issues"
   },
-  "homepage": "https://github.com/cxbuilder/flow-config#readme",
+  "homepage": "https://cxbuilder.ai",
   "engines": {
     "node": ">=22.0.0"
   }
